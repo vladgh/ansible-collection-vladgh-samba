@@ -44,9 +44,10 @@ jobs:
           - ubuntu2004
           - debian11
           - debian10
-          - centos8
           - fedora36
           - fedora37
+          - rockylinux8
+          - rockylinux9
         scenario: ${{ fromJSON(needs.changes.outputs.scenario) }}
     steps:
       - name: Checkout
