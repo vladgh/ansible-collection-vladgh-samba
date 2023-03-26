@@ -13,8 +13,6 @@
         - usr2
         - timemachine
   vars:
-    ansible_selinux:
-      status: enabled
     samba_netbios_name: NAS
     samba_server_string: NAS
     samba_workgroup: WORKGROUP
