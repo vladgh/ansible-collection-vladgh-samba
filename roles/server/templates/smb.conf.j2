@@ -128,7 +128,7 @@
   browseable = {{ share.browseable }}
 {% endif %}
 {% if share.writable is defined %}
-  writable = {{ share.writable | ternary('yes', 'no') }
+  writable = {{ share.writable | ternary('yes', 'no') }}
 {% endif %}
 {% if share.writeable is defined %}
   writeable = {{ share.writeable | ternary('yes', 'no') }}
