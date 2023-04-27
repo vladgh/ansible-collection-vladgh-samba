@@ -84,7 +84,7 @@
 [homes]
   comment = Home Directories
   browseable = no
-  writable = yes
+  writeable = yes
 {% endif %}
 
 {% if samba_homes_include is defined %}
@@ -128,7 +128,13 @@
   browseable = {{ share.browseable }}
 {% endif %}
 {% if share.writable is defined %}
-  writable = {{ share.writable }}
+  writable = {{ share.writable | ternary('yes', 'no') }
+{% endif %}
+{% if share.writeable is defined %}
+  writeable = {{ share.writeable | ternary('yes', 'no') }}
+{% endif %}
+{% if share.read_only is defined %}
+  read only = {{ share.read_only | ternary('yes', 'no') }}
 {% endif %}
   create mode = {{ share.create_mode|default('0664') }}
   force create mode = {{ share.force_create_mode|default('0664') }}

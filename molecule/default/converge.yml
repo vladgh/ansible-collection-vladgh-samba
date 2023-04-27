@@ -60,7 +60,7 @@
       - name: guestshare
         comment: 'Share accessible for guests'
         guest_ok: 'yes'
-        writable: 'yes'
+        writeable: 'yes'
         browseable: 'yes'
       - name: TimeMachine
         comment: 'Share useable as a TimeMachine backup target on MacOS'
