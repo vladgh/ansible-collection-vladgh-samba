@@ -105,6 +105,7 @@ See [Ansible Using collections](https://docs.ansible.com/ansible/latest/user_gui
 | `samba_server_string`          | `fileserver %m`          | Comment string for the server.                                                                                               |
 | `samba_shares_root`            | `/srv/shares`            | Directories for the shares are created under this directory.                                                                 |
 | `samba_shares`                 | []                       | List of dicts containing share definitions. See below for details.                                                           |
+| `samba_username_map`           | []                       | Makes username map configurable.                                                                         |
 | `samba_users`                  | []                       | List of dicts defining users that can access shares.                                                                         |
 | `samba_wins_support`           | true                     | When true, Samba will act as a WINS server                                                                                   |
 | `samba_workgroup`              | `WORKGROUP`              | Name of the server workgroup.                                                                                                |
@@ -215,6 +216,23 @@ A complete overview of share options follows below. Only `name` is required, the
 | `write_list`           | -                               | Controls write access for registered users. Use the syntax of the corresponding Samba setting. |
 
 The values for `valid_users` and `write_list` should be a comma separated list of users. Names prepended with `+` or `@` are interpreted as groups. The documentation for the [Samba configuration](https://www.samba.org/samba/docs/man/manpages-3/smb.conf.5.html) has more details on these options.
+
+## Username mapping
+
+Set `samba_username_map` variable as follows:
+
+```yaml
+samba_username_map:
+  - { from: 'UserOnWindows', to: 'userOnLinux' }
+  - { from: 'foo', to: 'bar' }
+```
+
+which is equal to username map as follows:
+
+```ini
+userOnLinux = UserOnWindows
+bar = foo
+```
 
 ## Adding arbitrary configuration files
 
