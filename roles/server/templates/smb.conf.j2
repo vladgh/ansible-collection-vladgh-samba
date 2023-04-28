@@ -2,20 +2,20 @@
 
 [global]
   # Server information
-  netbios name = {% if samba_netbios_name is defined %}{{ samba_netbios_name }}{% else %}{{ ansible_hostname }}{% endif %}
+  netbios name = {% if samba_netbios_name is defined and samba_netbios_name %}{{ samba_netbios_name }}{% else %}{{ ansible_hostname }}{% endif %}
 
   workgroup = {{ samba_workgroup }}
-{% if samba_realm is defined %}
+{% if samba_realm is defined and samba_realm %}
   realm = {{ samba_realm }}
 {% endif %}
   server string = {{ samba_server_string }}
 
-{% if samba_apple_extensions is defined %}
+{% if samba_apple_extensions is defined and samba_apple_extensions %}
   fruit:aapl = yes
 {% endif %}
 
   # Logging
-{% if samba_log is defined %}
+{% if samba_log is defined and samba_log %}
   log file = {{ samba_log }}
   max log size = {{ samba_log_size }}
   log level = {{ samba_log_level }}
@@ -27,19 +27,19 @@
   security = {{ samba_security }}
   passdb backend = {{ samba_passdb_backend }}
   map to guest = {{ samba_map_to_guest }}
-{% if samba_guest_account  is defined %}
+{% if samba_guest_account  is defined and samba_guest_account %}
   guest account = {{ samba_guest_account }}
 {% endif %}
-{% if samba_username_map is defined %}
+{% if samba_username_map is defined and samba_username_map %}
   username map = {{ samba_username_map_file }}
 {% endif %}
 
-{% if samba_server_min_protocol is defined %}
+{% if samba_server_min_protocol is defined and samba_server_min_protocol %}
   # Minimum protocol version offered by the server
   server min protocol = {{ samba_server_min_protocol }}
 
 {% endif %}
-{% if samba_server_max_protocol is defined %}
+{% if samba_server_max_protocol is defined and samba_server_max_protocol %}
   # Maximum protocol version offered by the server
   server max protocol = {{ samba_server_max_protocol }}
 
@@ -75,7 +75,7 @@
   nt pipe support = no
 {% endif %}
 
-{% if samba_global_include is defined %}
+{% if samba_global_include is defined and samba_global_include %}
   include = {{ samba_configuration_dir }}/{{ samba_global_include | basename }}
 {% endif %}
 
@@ -84,10 +84,10 @@
 [homes]
   comment = Home Directories
   browseable = no
-  writable = yes
+  writeable = yes
 {% endif %}
 
-{% if samba_homes_include is defined %}
+{% if samba_homes_include is defined and samba_homes_include %}
   include = {{ samba_configuration_dir }}/{{ samba_homes_include }}
 {% endif %}
 
@@ -112,34 +112,40 @@
 {% endfor %}{% endif %}
   path = {{ share.path|default([samba_shares_root,share.name]|join('/')) }}
   public = {{ share.public|default('no') }}
-{% if share.valid_users is defined %}
+{% if share.valid_users is defined and share.valid_users %}
   valid users= {{ share.valid_users }}
 {% endif %}
-{% if share.write_list is defined %}
+{% if share.write_list is defined and share.write_list %}
   write list = {{ share.write_list }}
 {% endif %}
-{% if share.group is defined %}
+{% if share.group is defined and share.group %}
   force group = {{ share.group }}
 {% endif %}
 {% if share.user is defined %}
   force user = {{ share.user }}
 {% endif %}
-{% if share.guest_ok is defined %}
+{% if share.guest_ok is defined and share.guest_ok %}
   guest ok = {{ share.guest_ok }}
 {% endif %}
-{% if share.browseable is defined %}
+{% if share.browseable is defined and share.browseable %}
   browseable = {{ share.browseable }}
 {% endif %}
-{% if share.writable is defined %}
-  writable = {{ share.writable }}
+{% if share.writable is defined and share.writable %}
+  writable = {{ share.writable | ternary('yes', 'no') }}
+{% endif %}
+{% if share.writeable is defined and share.writeable %}
+  writeable = {{ share.writeable | ternary('yes', 'no') }}
+{% endif %}
+{% if share.read_only is defined and share.read_only %}
+  read only = {{ share.read_only | ternary('yes', 'no') }}
 {% endif %}
   create mode = {{ share.create_mode|default('0664') }}
   force create mode = {{ share.force_create_mode|default('0664') }}
   directory mode = {{ share.directory_mode|default('0775') }}
   force directory mode = {{ share.force_directory_mode|default('0775') }}
-{% if share.include_file is defined %}
+{% if share.include_file is defined and share.include_file %}
   include = {{ samba_configuration_dir }}/{{ share.include_file | basename }}
 {% endif %}
 
 {% endfor %}
-{% endif%}
+{% endif %}
