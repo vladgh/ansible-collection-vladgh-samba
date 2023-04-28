@@ -47,6 +47,7 @@
         public: 'yes'
         comment: 'Public, but only writeable by usr2'
         write_list: usr2
+        user: usr2
         group: users
         browseable: 'yes'
         include_file: protectedshare-include.conf
