@@ -124,7 +124,7 @@
 {% if share.guest_ok is defined and share.guest_ok %}
   guest ok = {{ share.guest_ok }}
 {% endif %}
-{% if share.browseable is defined AND share.browseable %}
+{% if share.browseable is defined and share.browseable %}
   browseable = {{ share.browseable }}
 {% endif %}
 {% if share.writable is defined and share.writable %}
@@ -145,4 +145,4 @@
 {% endif %}
 
 {% endfor %}
-{% endif%}
+{% endif %}
