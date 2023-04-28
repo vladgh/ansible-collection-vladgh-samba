@@ -201,7 +201,7 @@ A complete overview of share options follows below. Only `name` is required, the
 | `include_file`         | -                               | Samba combatible configuration file with options to be included for this share (see below).    |
 | `force_create_mode`    | `0664`                          | See the Samba documentation for details.                                                       |
 | `force_directory_mode` | `0775`                          | See the Samba documentation for details.                                                       |
-| `group`                | `users`                         | The user group files in the share will be added to.                                            |
+| `group`                | `users`                         | The user group files in the share will be added to. (force group)                              |
 | `guest_ok`             | -                               | Allow guest access.                                                                            |
 | `name` (required)      | -                               | The name of the share.                                                                         |
 | `owner`                | `root`                          | Set the owner of the path                                                                      |
@@ -209,6 +209,7 @@ A complete overview of share options follows below. Only `name` is required, the
 | `public`               | `no`                            | Controls read access for guest users                                                           |
 | `read_only`               | -                            | If this parameter is yes, then users of a service may not create or modify files in the service's directory.                        |
 | `setype`               | `samba_share_t`                 | The SELinux type of the share directory                                                        |
+| `user`                 | -                               | The user files in the share will be added to. (force user)                                     |
 | `valid_users`          | -                               | Controls read access for registered users. Use the syntax of the corresponding Samba setting.  |
 | `vfs_objects`          | -                               | See the Samba documentation for details.                                                       |
 | `writable`             | -                               | Synonym for `writeable`.                                                                           |
