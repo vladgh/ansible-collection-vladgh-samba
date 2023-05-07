@@ -18,7 +18,7 @@
   ansible.builtin.package:
     name: "{{ samba_vfs_packages }}"
     state: present
-  when: samba_vfs_packages is defined
+  when: samba_vfs_packages is defined and samba_vfs_packages | length > 0
   tags: samba
 
 - name: Register Samba version
