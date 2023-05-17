@@ -2,16 +2,6 @@
 - name: Converge
   hosts: all
   become: true
-  pre_tasks:
-    - name: Add test users
-      ansible.builtin.user:
-        name: "{{ item }}"
-        groups: users
-        append: true
-      with_items:
-        - usr1
-        - usr2
-        - timemachine
   vars:
     samba_netbios_name: NAS
     samba_server_string: NAS
@@ -78,5 +68,17 @@
         public: 'no'
         guest_ok: 'no'
         browseable: 'no'
-  roles:
-    - server
+  pre_tasks:
+    - name: Add test users
+      ansible.builtin.user:
+        name: "{{ item }}"
+        groups: users
+        append: true
+      with_items:
+        - usr1
+        - usr2
+        - timemachine
+  tasks:
+    - name: Include role
+      ansible.builtin.include_role:
+        name: server
