@@ -15,7 +15,7 @@
   tasks:
     - name: Include role
       ansible.builtin.include_role:
-        name: server
+        name: vladgh.samba.server
       vars:
         samba_netbios_name: NAS
         samba_server_string: NAS
