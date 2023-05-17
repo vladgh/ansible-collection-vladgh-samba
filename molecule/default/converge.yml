@@ -2,17 +2,16 @@
 - name: Converge
   hosts: all
   become: true
-  pre_tasks:
+  tasks:
     - name: Add test users
       ansible.builtin.user:
         name: "{{ item }}"
         groups: users
         append: true
-      with_items:
+      loop:
         - usr1
         - usr2
         - timemachine
-  tasks:
     - name: Include role
       ansible.builtin.include_role:
         name: vladgh.samba.server
