@@ -1,4 +1,3 @@
-# roles/samba/defaults/main.yml
 ---
 
 samba_workgroup: 'WORKGROUP'
