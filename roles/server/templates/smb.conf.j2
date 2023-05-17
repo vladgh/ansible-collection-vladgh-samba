@@ -3,6 +3,7 @@
 [global]
   # Server information
   netbios name = {% if samba_netbios_name is defined and samba_netbios_name %}{{ samba_netbios_name }}{% else %}{{ ansible_hostname }}{% endif %}
+  mdns name = {% if samba_mdns_name is defined and samba_mdns_name %}{{ samba_mdns_name }}{% else %}netbios{% endif %}
 
   workgroup = {{ samba_workgroup }}
 {% if samba_realm is defined and samba_realm %}
