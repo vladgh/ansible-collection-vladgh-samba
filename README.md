@@ -60,7 +60,7 @@ collections:
 ---
 - name: Common
   hosts: all
-  become: yes
+  become: true
   roles:
     - role: vladgh.samba.server
 ```
@@ -134,7 +134,7 @@ These users should already have an account on the host! Creating system users is
     name: james
     shell: /bin/bash
     groups: admins,developers
-    append: yes
+    append: true
 ```
 
 ### Defining shares
@@ -184,8 +184,8 @@ samba_shares:
           - name: loglevel
             value: 7
     path: /
-    read_only: no
-    guest_ok: yes
+    read_only: 'no'
+    guest_ok: 'yes'
     write_list: tomcat
     group: tomcat
 ```
