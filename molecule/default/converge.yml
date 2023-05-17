@@ -1,7 +1,7 @@
 ---
 - name: Converge
   hosts: all
-  become: yes
+  become: true
   pre_tasks:
     - name: Add test users
       ansible.builtin.user:
