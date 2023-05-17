@@ -79,4 +79,4 @@
         guest_ok: 'no'
         browseable: 'no'
   roles:
-    - ./roles/server
+    - server
