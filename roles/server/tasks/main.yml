@@ -1,11 +1,14 @@
 ---
 
 - name: Include OS specific variables
-  ansible.builtin.include_vars: "{{ item }}"
-  with_first_found:
-    - "os_{{ ansible_distribution }}.yml"
-    - "os_{{ ansible_os_family }}.yml"
-  tags: samba
+  ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
+  vars:
+    params:
+      files:
+        - 'os_{{ ansible_distribution }}.yml'
+        - 'os_{{ ansible_os_family }}.yml'
+      paths:
+        - 'vars'
 
 - name: Install Samba packages
   ansible.builtin.package:
@@ -42,7 +45,7 @@
     name: "{{ item }}"
     state: true
     persistent: true
-  with_items: "{{ samba_selinux_booleans }}"
+  loop: "{{ samba_selinux_booleans }}"
   when: ansible_selinux is defined and ansible_selinux.status == 'enabled'
   tags: samba
 
@@ -64,7 +67,7 @@
     group: "{{ item.group | default('users') }}"
     mode: "{{ item.directory_mode | default('0775') }}"
     setype: "{{ item.setype | default('samba_share_t') }}"
-  with_items: "{{ samba_shares }}"
+  loop: "{{ samba_shares }}"
   tags: samba
 
 - name: Ensure webserver document root exists
@@ -80,7 +83,7 @@
     state: link
     path: "{{ samba_www_documentroot }}/{{ item.name }}"
     src: "{{ item.path | default([samba_shares_root, item.name] | join('/')) }}"
-  with_items: "{{ samba_shares }}"
+  loop: "{{ samba_shares }}"
   when: samba_create_varwww_symlinks|bool
   tags: samba
 
@@ -125,7 +128,7 @@
   when: item.include_file is defined
   notify:
     - Restart Samba services
-  with_items: "{{ samba_shares }}"
+  loop: "{{ samba_shares }}"
   tags: samba
 
 - name: Create username map file if needed
@@ -143,7 +146,7 @@
     name: "{{ item }}"
     state: started
     enabled: true
-  with_items: "{{ samba_services }}"
+  loop: "{{ samba_services }}"
   tags: samba
 
 - name: Create Samba users if they don't exist yet
@@ -154,7 +157,7 @@
     | smbpasswd -s -a {{ item.name }}
   args:
     executable: /bin/bash
-  with_items: "{{ samba_users }}"
+  loop: "{{ samba_users }}"
   no_log: true
   register: create_user_output
   changed_when: "'Added user' in create_user_output.stdout"

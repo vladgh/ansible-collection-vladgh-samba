@@ -3,4 +3,4 @@
   ansible.builtin.service:
     name: "{{ item }}"
     state: restarted
-  with_items: "{{ samba_services }}"
+  loop: "{{ samba_services }}"
