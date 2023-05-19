@@ -2,5 +2,7 @@
 - name: Samba Servers
   hosts: samba
   become: true
-  roles:
-    - vladgh.samba.server
+  tasks:
+    - name: Include Samba Server role
+      ansible.builtin.include_role:
+        name: vladgh.samba.server
