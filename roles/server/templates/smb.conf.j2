@@ -93,7 +93,7 @@
   include = {{ samba_configuration_dir }}/{{ samba_homes_include }}
 {% endif %}
 
-{% if samba_shares id defined and samba_shares | length > 0 %}
+{% if samba_shares is defined and samba_shares | length > 0 %}
 ## Shared directories
 {% for share in samba_shares %}
 [{{ share.name }}]
