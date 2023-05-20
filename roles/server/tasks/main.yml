@@ -14,7 +14,7 @@
   ansible.builtin.package:
     name: "{{ samba_packages }}"
     state: present
-    when: samba_packages is defined and samba_packages | length > 0
+  when: samba_packages is defined and samba_packages | length > 0
   tags: samba
 
 - name: Install Samba VFS extensions packages
