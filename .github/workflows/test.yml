@@ -44,8 +44,8 @@ jobs:
           - ubuntu2004
           - debian11
           - debian10
-          - fedora36
           - fedora37
+          - fedora38
           - rockylinux8
           - rockylinux9
         scenario: ${{ fromJSON(needs.changes.outputs.scenario) }}
