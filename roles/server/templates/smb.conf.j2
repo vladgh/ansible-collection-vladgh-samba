@@ -11,7 +11,7 @@
 {% endif %}
   server string = {{ samba_server_string }}
 
-{% if samba_apple_extensions is defined and samba_apple_extensions %}
+{% if samba_apple_extensions is defined and samba_apple_extensions | bool %}
   fruit:aapl = yes
 {% endif %}
 
@@ -45,7 +45,7 @@
   server max protocol = {{ samba_server_max_protocol }}
 
 {% endif %}
-{% if samba_interfaces|length > 0 %}
+{% if samba_interfaces | length > 0 %}
   bind interfaces only = yes
   interfaces = 127.0.0.1 {{ samba_interfaces|join(' ') }}
 
@@ -56,19 +56,19 @@
   domain master = {{ samba_domain_master | ternary('yes', 'no') }}
   preferred master = {{ samba_preferred_master | ternary('yes', 'no') }}
 
-{% if not samba_load_printers %}
-  # Don't load printers
-  load printers = no
-  printing = bsd
-  printcap name = /dev/null
-  disable spoolss = yes
-{% else %}
+{% if samba_load_printers %}
   load printers = yes
   printing = {{ samba_printer_type }}
   printcap name = {{ samba_printer_type }}
   {% if samba_printer_type == 'cups' %}
     cups server = {{ samba_cups_server }}
   {% endif %}
+{% else %}
+  # Don't load printers
+  load printers = no
+  printing = bsd
+  printcap name = /dev/null
+  disable spoolss = yes
 {% endif %}
 
 {% if samba_mitigate_cve_2017_7494 and samba_version.stdout is version('3.5.0', '>=') and samba_version.stdout is version('4.6.4', '<') %}
@@ -82,7 +82,7 @@
 {% endif %}
 
 {% if samba_load_homes %}
-## Make home directories accessible
+# Make home directories accessible
 [homes]
   comment = Home Directories
   browseable = no
@@ -93,27 +93,25 @@
   include = {{ samba_configuration_dir }}/{{ samba_homes_include }}
 {% endif %}
 
-{% if samba_shares|length > 0 %}
+{% if samba_shares id defined and samba_shares | length > 0 %}
 ## Shared directories
 {% for share in samba_shares %}
 [{{ share.name }}]
-{% if share.comment is defined %}
+{% if share.comment is defined and share.comment %}
   comment = {{ share.comment }}
 {% endif %}
-{% if share.vfs_objects is defined and share.vfs_objects|length > 0 %}
+{% if share.vfs_objects is defined and share.vfs_objects | length > 0 %}
   vfs objects = {% for obj in share.vfs_objects %}{{obj.name}} {% endfor %}
 
 {% for obj in share.vfs_objects %}
-{% if obj.options is defined %}
-{% if obj.options|length > 0 %}
+{% if obj.options is defined and obj.options | length > 0 %}
 {% for opt in obj.options %}
   {{ obj.name }}:{{ opt.name }} = {{ opt.value }}
 {% endfor %}
 {% endif %}
-{% endif %}
 {% endfor %}{% endif %}
-  path = {{ share.path|default([samba_shares_root,share.name]|join('/')) }}
-  public = {{ share.public|default('no') }}
+  path = {{ share.path | default([samba_shares_root,share.name] | join('/')) }}
+  public = {{ share.public | default('no') }}
 {% if share.valid_users is defined and share.valid_users %}
   valid users= {{ share.valid_users }}
 {% endif %}
@@ -123,14 +121,17 @@
 {% if share.group is defined and share.group %}
   force group = {{ share.group }}
 {% endif %}
-{% if share.user is defined %}
+{% if share.user is defined and share.user %}
   force user = {{ share.user }}
 {% endif %}
 {% if share.guest_ok is defined and share.guest_ok %}
   guest ok = {{ share.guest_ok }}
 {% endif %}
+{% if share.browsable is defined and share.browsable %}
+  browsable = {{ share.browsable | ternary('yes', 'no') }}
+{% endif %}
 {% if share.browseable is defined and share.browseable %}
-  browseable = {{ share.browseable }}
+  browseable = {{ share.browseable | ternary('yes', 'no') }}
 {% endif %}
 {% if share.writable is defined and share.writable %}
   writable = {{ share.writable | ternary('yes', 'no') }}
@@ -141,10 +142,10 @@
 {% if share.read_only is defined and share.read_only %}
   read only = {{ share.read_only | ternary('yes', 'no') }}
 {% endif %}
-  create mode = {{ share.create_mode|default('0664') }}
-  force create mode = {{ share.force_create_mode|default('0664') }}
-  directory mode = {{ share.directory_mode|default('0775') }}
-  force directory mode = {{ share.force_directory_mode|default('0775') }}
+  create mode = {{ share.create_mode | default('0664') }}
+  force create mode = {{ share.force_create_mode | default('0664') }}
+  directory mode = {{ share.directory_mode | default('0775') }}
+  force directory mode = {{ share.force_directory_mode | default('0775') }}
 {% if share.include_file is defined and share.include_file %}
   include = {{ samba_configuration_dir }}/{{ share.include_file | basename }}
 {% endif %}

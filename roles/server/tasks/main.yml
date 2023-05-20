@@ -14,6 +14,7 @@
   ansible.builtin.package:
     name: "{{ samba_packages }}"
     state: present
+    when: samba_packages is defined and samba_packages | length > 0
   tags: samba
 
 - name: Install Samba VFS extensions packages
@@ -56,7 +57,7 @@
     owner: root
     group: root
     mode: '0755'
-  when: samba_shares|length > 0
+  when: samba_shares is defined and samba_shares | length > 0
   tags: samba
 
 - name: Create share directories
@@ -68,6 +69,7 @@
     mode: "{{ item.directory_mode | default('0775') }}"
     setype: "{{ item.setype | default('samba_share_t') }}"
   loop: "{{ samba_shares }}"
+  when: samba_shares is defined and samba_shares | length > 0
   tags: samba
 
 - name: Ensure webserver document root exists
@@ -75,7 +77,7 @@
     name: "{{ samba_www_documentroot }}"
     state: directory
     mode: '0755'
-  when: samba_create_varwww_symlinks|bool
+  when: samba_create_varwww_symlinks | bool
   tags: samba
 
 - name: Create link to shares in webserver document root
@@ -84,7 +86,9 @@
     path: "{{ samba_www_documentroot }}/{{ item.name }}"
     src: "{{ item.path | default([samba_shares_root, item.name] | join('/')) }}"
   loop: "{{ samba_shares }}"
-  when: samba_create_varwww_symlinks|bool
+  when: >
+        ( samba_shares is defined and samba_shares | length > 0 ) and
+        samba_create_varwww_symlinks | bool
   tags: samba
 
 - name: Samba configuration
@@ -103,7 +107,7 @@
     dest: "{{ samba_configuration_dir }}"
     validate: 'testparm -s %s'
     mode: '0644'
-  when: samba_global_include is defined
+  when: samba_global_include is defined and samba_global_include
   notify:
     - Restart Samba services
   tags: samba
@@ -114,7 +118,7 @@
     dest: "{{ samba_configuration_dir }}"
     validate: 'testparm -s %s'
     mode: '0644'
-  when: samba_homes_include is defined
+  when: samba_homes_include is defined and samba_homes_include
   notify:
     - Restart Samba services
   tags: samba
@@ -125,10 +129,12 @@
     dest: "{{ samba_configuration_dir }}"
     validate: 'testparm -s %s'
     mode: '0644'
-  when: item.include_file is defined
+  when: >
+        ( samba_shares is defined and samba_shares | length > 0 ) and
+        ( item.include_file is defined and item.include_file )
+  loop: "{{ samba_shares }}"
   notify:
     - Restart Samba services
-  loop: "{{ samba_shares }}"
   tags: samba
 
 - name: Create username map file if needed
@@ -138,7 +144,7 @@
     mode: '0644'
   notify:
     - Restart Samba services
-  when: samba_username_map is defined
+  when: samba_username_map is defined and samba_username_map
   tags: samba
 
 - name: Start Samba service(s)
@@ -157,8 +163,9 @@
     | smbpasswd -s -a {{ item.name }}
   args:
     executable: /bin/bash
-  loop: "{{ samba_users }}"
   no_log: true
   register: create_user_output
+  loop: "{{ samba_users }}"
+  when: samba_users is defined and samba_users | length > 0
   changed_when: "'Added user' in create_user_output.stdout"
   tags: samba
