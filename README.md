@@ -61,8 +61,10 @@ collections:
 - name: Common
   hosts: all
   become: true
-  roles:
-    - role: vladgh.samba.server
+  tasks:
+    - name: Include Samba Server role
+      ansible.builtin.include_role:
+        name: vladgh.samba.server
 ```
 
 ### Import Playbooks
