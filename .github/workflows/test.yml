@@ -42,8 +42,8 @@ jobs:
         os:
           - ubuntu2204
           - ubuntu2004
+          - debian12
           - debian11
-          - debian10
           - fedora37
           - fedora38
           - rockylinux8
