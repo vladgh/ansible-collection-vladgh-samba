@@ -11,8 +11,8 @@ galaxy_info:
         - focal
     - name: Debian
       versions:
+        - bookworm
         - bullseye
-        - buster
     - name: Fedora
       versions:
         - '37'
