@@ -71,10 +71,11 @@ collections:
 
 ```yaml
 ---
-- import_playbook: vladgh.samba.server
+- name: Samba Server
+  ansible.builtin.import_playbook: vladgh.samba.server
 ```
 
-See [Ansible Using collections](https://docs.ansible.com/ansible/latest/user_guide/collections_using.html) for more details.
+See [Ansible using collections](https://docs.ansible.com/ansible/latest/user_guide/collections_using.html) for more details.
 
 ## Server Role Variables
 
