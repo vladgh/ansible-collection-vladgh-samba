@@ -15,12 +15,12 @@ galaxy_info:
         - bullseye
     - name: Fedora
       versions:
-        - '37'
         - '38'
+        - '37'
     - name: EL
       versions:
-        - '8'
         - '9'
+        - '8'
     - name: ArchLinux
       versions:
         - all
