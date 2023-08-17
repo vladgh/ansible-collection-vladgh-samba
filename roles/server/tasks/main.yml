@@ -71,8 +71,7 @@
     setype: "{{ item.setype | default('samba_share_t') }}"
   loop: "{{ samba_shares }}"
   when: ( samba_shares is defined and samba_shares | length > 0 ) and
-        ( samba_manage_directories is defined and samba_manage_directories ) and
-        ( item.manage_directory is undefined or item.manage_directory != false )
+        ( samba_manage_directories is defined and samba_manage_directories )
   tags: samba
 
 - name: Ensure webserver document root exists
