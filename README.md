@@ -108,6 +108,7 @@ See [Ansible using collections](https://docs.ansible.com/ansible/latest/user_gui
 | `samba_server_min_protocol`    | -                        | Specify a minimum protocol version offered by the server.                                                                    |
 | `samba_server_string`          | `fileserver %m`          | Comment string for the server.                                                                                               |
 | `samba_shares_root`            | `/srv/shares`            | Directories for the shares are created under this directory.                                                                 |
+| `samba_manage_directories`     | `true`                   | Create the directories, and manage the permissions/ownership, of the shares root and the shares under it.                    |
 | `samba_shares`                 | `[]`                       | List of dicts containing share definitions. See below for details.                                                           |
 | `samba_username_map`           | `[]`                       | Makes username map configurable.                                                                         |
 | `samba_users`                  | `[]`                       | List of dicts defining users that can access shares.                                                                         |
