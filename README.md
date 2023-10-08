@@ -5,7 +5,6 @@
 An Ansible collection for setting up Samba as a file server. It is tested on Ubuntu, Debian, CentOS and Arch Linux. Specifically, the responsibilities of this collection are to:
 
 - Install the necessary packages
-- Configure SELinux settings (when SELinux is active)
 - Create share directories
 - Manage Samba users and passwords
 - Manage access to shares
@@ -231,7 +230,7 @@ A complete overview of share options follows below. Only `name` is required, the
 | `path`                 | `/{{samba_shares_root}}/{{name}}` | The path to the share directory.                                                               |
 | `public`               | `no`                            | Controls read access for guest users                                                           |
 | `read_only`               | -                            | If this parameter is yes, then users of a service may not create or modify files in the service's directory.                        |
-| `setype`               | `samba_share_t`                 | The SELinux type of the share directory                                                        |
+| `setype`               | -                 | The SELinux type of the share directory                                                        |
 | `user`                 | -                               | The user files in the share will be added to. (force user)                                     |
 | `valid_users`          | -                               | Controls read access for registered users. Use the syntax of the corresponding Samba setting.  |
 | `vfs_objects`          | -                               | See the Samba documentation for details.                                                       |
@@ -287,7 +286,7 @@ The [test playbook](molecule/default/converge.yml) has some examples.
 
 ## Dependencies
 
-- [Ansible Posix](https://docs.ansible.com/ansible/latest/collections/ansible/posix/)
+N/A
 
 ## Testing
 
