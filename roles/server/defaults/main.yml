@@ -14,6 +14,7 @@ samba_cups_server: 'localhost:631'
 samba_load_homes: false
 samba_create_varwww_symlinks: false
 samba_shares_root: '/srv/shares'
+samba_manage_directories: true
 samba_shares: []
 samba_users: []
 

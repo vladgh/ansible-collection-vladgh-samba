@@ -28,7 +28,7 @@ More info: <https://access.redhat.com/security/cve/cve-2017-7494>
 
 ## Using this collection
 
-### Installing the Collection from Ansible Galaxy
+### Install collection
 
 Install it with the Ansible Galaxy CLI:
 
@@ -44,7 +44,16 @@ collections:
   - name: vladgh.samba
 ```
 
-Using the GitHub repository and specific branch or release:
+Optionally, You can specify a version number:
+
+```yaml
+---
+collections:
+  - name: vladgh.samba
+    version: ">=3.1.1"
+```
+
+You can also refer to a branch or to a git commit-ish object (commit, tag, branch or release)
 
 ```yaml
 collections:
@@ -53,11 +62,19 @@ collections:
     type: git
 ```
 
-### Import Roles
+For more information, see [Ansible using collections](https://docs.ansible.com/ansible/latest/user_guide/collections_using.html)
+
+### Load role
+
+After the collection is installed you can include the `server` role.
+You can define variables in a variety of places, such as in inventory, in playbooks, in reusable files, in roles, and at the command line. Ansible loads every possible variable it finds, then chooses the variable to apply based on [variable precedence rules](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#ansible-variable-precedence).
+A complete overview of server role variables follows below.
+
+For more information, see [Using variables](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#where-to-set-variables).
 
 ```yaml
 ---
-- name: Common
+- name: Samba Server
   hosts: all
   become: true
   tasks:
@@ -66,15 +83,15 @@ collections:
         name: vladgh.samba.server
 ```
 
-### Import Playbooks
+### Import playbook
+
+Alternatively, you can directly import the existing playbook:
 
 ```yaml
 ---
 - name: Samba Server
   ansible.builtin.import_playbook: vladgh.samba.server
 ```
-
-See [Ansible using collections](https://docs.ansible.com/ansible/latest/user_guide/collections_using.html) for more details.
 
 ## Server Role Variables
 
@@ -107,6 +124,7 @@ See [Ansible using collections](https://docs.ansible.com/ansible/latest/user_gui
 | `samba_server_min_protocol`    | -                        | Specify a minimum protocol version offered by the server.                                                                    |
 | `samba_server_string`          | `fileserver %m`          | Comment string for the server.                                                                                               |
 | `samba_shares_root`            | `/srv/shares`            | Directories for the shares are created under this directory.                                                                 |
+| `samba_manage_directories`     | `true`                   | Create the directories, and manage the permissions/ownership, of the shares root and the shares under it.                    |
 | `samba_shares`                 | `[]`                       | List of dicts containing share definitions. See below for details.                                                           |
 | `samba_username_map`           | `[]`                       | Makes username map configurable.                                                                         |
 | `samba_users`                  | `[]`                       | List of dicts defining users that can access shares.                                                                         |

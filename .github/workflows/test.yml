@@ -21,7 +21,7 @@ jobs:
       scenario: ${{ steps.filter.outputs.changes }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3.5.3
+        uses: actions/checkout@v4.1.0
       - name: Detect changes
         uses: dorny/paths-filter@v2.11.1
         id: filter
@@ -51,11 +51,11 @@ jobs:
         scenario: ${{ fromJSON(needs.changes.outputs.scenario) }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3.5.3
+        uses: actions/checkout@v4.1.0
         with:
           path: ansible_collections/vladgh/samba
       - name: Molecule test
-        uses: gofrolist/molecule-action@v2.4.1
+        uses: gofrolist/molecule-action@v2.5.3
         with:
           molecule_command: test
           molecule_options: --debug
