@@ -2,15 +2,13 @@
 
 [global]
   # Server information
-  netbios name = {% if samba_netbios_name is defined and samba_netbios_name %}{{ samba_netbios_name }}{% else %}{{ ansible_hostname }}{% endif %}
-  mdns name = {% if samba_mdns_name is defined and samba_mdns_name %}{{ samba_mdns_name }}{% else %}netbios{% endif %}
-
+  netbios name = {% if samba_netbios_name is defined and samba_netbios_name %}{{ samba_netbios_name }}{% else %}{{ ansible_hostname }}{% endif +%}
+  mdns name = {% if samba_mdns_name is defined and samba_mdns_name %}{{ samba_mdns_name }}{% else %}netbios{% endif +%}
   workgroup = {{ samba_workgroup }}
 {% if samba_realm is defined and samba_realm %}
   realm = {{ samba_realm }}
 {% endif %}
   server string = {{ samba_server_string }}
-
 {% if samba_apple_extensions is defined and samba_apple_extensions | bool %}
   fruit:aapl = yes
 {% endif %}
