@@ -133,13 +133,20 @@
   when: samba_username_map is defined and samba_username_map
   tags: samba
 
-- name: Start Samba service(s)
+- name: Start SMB service
   ansible.builtin.service:
-    name: "{{ item }}"
+    name: "{{ smb_service }}"
     state: started
     enabled: true
-  loop: "{{ samba_services }}"
   tags: samba
+
+- name: Start NMB service
+  ansible.builtin.service:
+    name: "{{ nmb_service }}"
+    state: started
+    enabled: true
+  tags: samba
+  when: not samba_disable_netbios
 
 - name: Create Samba users if they don't exist yet
   ansible.builtin.shell: >

@@ -9,8 +9,7 @@ samba_configuration_dir: /etc/samba
 samba_configuration: "{{ samba_configuration_dir }}/smb.conf"
 samba_username_map_file: "{{ samba_configuration_dir }}/smbusers"
 
-samba_services:
-  - smb
-  - nmb
+smb_service: smb
+nmb_service: nmb
 
 samba_www_documentroot: /var/www

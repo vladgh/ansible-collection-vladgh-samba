@@ -1,6 +1,11 @@
 ---
-- name: Restart Samba services
+- name: Restart SMB service
   ansible.builtin.service:
-    name: "{{ item }}"
+    name: "{{ smb_service }}"
     state: restarted
-  loop: "{{ samba_services }}"
+
+- name: Restart NMB service
+  ansible.builtin.service:
+    name: "{{ nmb_service }}"
+    state: restarted
+  when: not samba_disable_netbios

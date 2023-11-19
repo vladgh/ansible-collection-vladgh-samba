@@ -48,7 +48,10 @@
   interfaces = 127.0.0.1 {{ samba_interfaces | join(' ') }}
 
 {% endif %}
-  # Name resolution: make sure \\NETBIOS_NAME\ works
+  # Name resolution
+{% if samba_disable_netbios %}
+  disable netbios = yes
+{% endif %}
   wins support = {{ samba_wins_support | ternary('yes', 'no') }}
   local master = {{ samba_local_master | ternary('yes', 'no') }}
   domain master = {{ samba_domain_master | ternary('yes', 'no') }}
