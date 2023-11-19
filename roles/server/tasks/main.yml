@@ -84,7 +84,8 @@
     validate: 'testparm -s %s'
     mode: '0644'
   notify:
-    - Restart Samba services
+    - Restart SMB service
+    - Restart NMB service
   tags: samba
 
 - name: Install global include file
@@ -95,7 +96,8 @@
     mode: '0644'
   when: samba_global_include is defined and samba_global_include
   notify:
-    - Restart Samba services
+    - Restart SMB service
+    - Restart NMB service
   tags: samba
 
 - name: Install home include file
@@ -106,7 +108,8 @@
     mode: '0644'
   when: samba_homes_include is defined and samba_homes_include
   notify:
-    - Restart Samba services
+    - Restart SMB service
+    - Restart NMB service
   tags: samba
 
 - name: Install share specific include files
@@ -120,7 +123,8 @@
         ( item.include_file is defined and item.include_file )
   loop: "{{ samba_shares }}"
   notify:
-    - Restart Samba services
+    - Restart SMB service
+    - Restart NMB service
   tags: samba
 
 - name: Create username map file if needed
@@ -129,17 +133,25 @@
     src: smbusers.j2
     mode: '0644'
   notify:
-    - Restart Samba services
+    - Restart SMB service
+    - Restart NMB service
   when: samba_username_map is defined and samba_username_map
   tags: samba
 
-- name: Start Samba service(s)
+- name: Start SMB service
   ansible.builtin.service:
-    name: "{{ item }}"
+    name: "{{ smb_service }}"
     state: started
     enabled: true
-  loop: "{{ samba_services }}"
   tags: samba
+
+- name: Start NMB service
+  ansible.builtin.service:
+    name: "{{ nmb_service }}"
+    state: started
+    enabled: true
+  tags: samba
+  when: samba_enable_netbios | bool
 
 - name: Create Samba users if they don't exist yet
   ansible.builtin.shell: >
