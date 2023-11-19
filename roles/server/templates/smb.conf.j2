@@ -49,7 +49,7 @@
 
 {% endif %}
   # Name resolution
-{% if not samba_enable_netbios %}
+{% if not samba_enable_netbios | bool %}
   disable netbios = yes
 {% endif %}
   wins support = {{ samba_wins_support | ternary('yes', 'no') }}
