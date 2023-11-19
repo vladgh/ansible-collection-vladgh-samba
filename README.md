@@ -100,7 +100,7 @@ Alternatively, you can directly import the existing playbook:
 | `samba_apple_extensions`       | `no`                       | When yes, enables support for Apple specific SMB extensions. Required for Time Machine support to work (see below)       |
 | `samba_create_varwww_symlinks` | `false`                    | When true, symlinks are created in web docroot to the shares. (`var/www/` or `/var/www/html` depending on platform) |
 | `samba_cups_server`            | `localhost:631`            | Value for the global option `cups server` (only needed when `samba_printer_type` is "cups")                                  |
-| `samba_disable_netbios`        | `false`                  | When true, the NMB daemon is disabled. This overrides other NetBIOS related settings.                                        |
+| `samba_enable_netbios`         | `true`                   | When false, the NMB daemon is disabled by setting `disable netbios` to `yes`. This overrides other NetBIOS related settings. |
 | `samba_domain_master`          | `true`                     | When true, smbd enables WAN-wide browse list collation                                                                       |
 | `samba_global_include`         | -                        | Samba-compatible configuration file with options to be loaded to [global] section (see below)                                |
 | `samba_guest_account`          | -                        | Guest account for unknown users                                                                                              |

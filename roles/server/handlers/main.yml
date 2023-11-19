@@ -8,4 +8,4 @@
   ansible.builtin.service:
     name: "{{ nmb_service }}"
     state: restarted
-  when: not samba_disable_netbios
+  when: samba_enable_netbios

@@ -146,7 +146,7 @@
     state: started
     enabled: true
   tags: samba
-  when: not samba_disable_netbios
+  when: samba_enable_netbios
 
 - name: Create Samba users if they don't exist yet
   ansible.builtin.shell: >

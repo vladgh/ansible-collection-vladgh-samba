@@ -18,7 +18,7 @@ samba_manage_directories: true
 samba_shares: []
 samba_users: []
 
-samba_disable_netbios: 'no'
+samba_enable_netbios: 'yes'
 samba_wins_support: 'yes'
 samba_local_master: 'yes'
 samba_domain_master: 'yes'
