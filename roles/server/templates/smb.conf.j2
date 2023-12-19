@@ -125,10 +125,10 @@
 {% if share.guest_ok is defined and share.guest_ok %}
   guest ok = {{ share.guest_ok }}
 {% endif %}
-{% if share.browsable is defined and share.browsable %}
+{% if share.browsable is defined and not share.browsable %}
   browsable = {{ share.browsable | ternary('yes', 'no') }}
 {% endif %}
-{% if share.browseable is defined and share.browseable %}
+{% if share.browseable is defined and not share.browseable %}
   browseable = {{ share.browseable | ternary('yes', 'no') }}
 {% endif %}
 {% if share.writable is defined and share.writable %}
