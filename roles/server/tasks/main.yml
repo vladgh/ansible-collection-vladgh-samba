@@ -32,6 +32,7 @@
     executable: /bin/bash
   register: samba_version
   changed_when: false
+  check_mode: false
   tags: samba
 
 - name: Create Samba shares root directory
