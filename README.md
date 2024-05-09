@@ -97,7 +97,7 @@ Alternatively, you can directly import the existing playbook:
 
 | Variable                       | Default                  | Comments                                                                                                                     |
 | :---                           | :---                     | :---                                                                                                                         |
-| `samba_apple_extensions`       | `no`                       | When yes, enables support for Apple specific SMB extensions. Required for Time Machine support to work (see below)       |
+| `samba_apple_extensions`       | `true`                       | When yes, enables support for Apple specific SMB extensions. Required for Time Machine support to work (see below)       |
 | `samba_create_varwww_symlinks` | `false`                    | When true, symlinks are created in web docroot to the shares. (`var/www/` or `/var/www/html` depending on platform) |
 | `samba_cups_server`            | `localhost:631`            | Value for the global option `cups server` (only needed when `samba_printer_type` is "cups")                                  |
 | `samba_enable_netbios`         | `true`                   | When false, the NMB daemon is disabled by setting `disable netbios` to `yes`. This overrides other NetBIOS related settings. |
@@ -182,7 +182,7 @@ samba_shares:
     write_list: +pirates
 ```
 
-Guests have no access to this share, registered users can read. You can further tweak access control. Read access can be extended to guests (add `public: yes`) or restricted to specified users or groups (add `valid_users: +pirates`). Write access can be restricted to individual pirates (e.g. `write_list: jack`). Files added to the share will be added to the specified group and group write access will be granted by default.
+Guests have no access to this share, registered users can read. You can further tweak access control. Read access can be extended to guests (add `public: true`) or restricted to specified users or groups (add `valid_users: +pirates`). Write access can be restricted to individual pirates (e.g. `write_list: jack`). Files added to the share will be added to the specified group and group write access will be granted by default.
 
 This is an example of configuring multiple vfs object modules to share a glusterfs volume. VFS object options are optional. The necessary VFS object modules must be present/installed outside this collection. In this case samba-glusterfs was installed on centos. See samba documentation for how to install or what the default VFS object modules are.
 
@@ -206,8 +206,8 @@ samba_shares:
           - name: loglevel
             value: 7
     path: /
-    read_only: 'no'
-    guest_ok: 'yes'
+    read_only: false
+    guest_ok: true
     write_list: tomcat
     group: tomcat
 ```
@@ -229,7 +229,7 @@ A complete overview of share options follows below. Only `name` is required, the
 | `name` (required)      | -                               | The name of the share.                                                                         |
 | `owner`                | `root`                          | Set the owner of the path                                                                      |
 | `path`                 | `/{{samba_shares_root}}/{{name}}` | The path to the share directory.                                                               |
-| `public`               | `no`                            | Controls read access for guest users                                                           |
+| `public`               | `false`                            | Controls read access for guest users                                                           |
 | `read_only`               | -                            | If this parameter is yes, then users of a service may not create or modify files in the service's directory.                        |
 | `setype`               | -                 | The SELinux type of the share directory                                                        |
 | `user`                 | -                               | The user files in the share will be added to. (force user)                                     |
