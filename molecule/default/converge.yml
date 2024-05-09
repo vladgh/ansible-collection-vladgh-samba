@@ -46,39 +46,39 @@
             valid_users: usr1
             write_list: usr1
             group: usr1
-            browseable: 'no'
+            browseable: false
           - name: protectedshare
-            public: 'yes'
+            public: true
             comment: 'Public, but only writeable by usr2'
             write_list: usr2
             user: usr2
             group: users
-            browseable: 'yes'
+            browseable: true
             include_file: protectedshare-include.conf
           - name: publicshare
             comment: 'Public share, writeable by all members of group ‘users’'
-            public: 'yes'
+            public: true
             write_list: +users
             group: users
-            browseable: 'yes'
+            browseable: true
           - name: guestshare
             comment: 'Share accessible for guests'
-            guest_ok: 'yes'
-            writeable: 'yes'
-            browseable: 'yes'
+            guest_ok: true
+            writeable: true
+            browseable: true
           - name: TimeMachine
             comment: 'Share useable as a TimeMachine backup target on MacOS'
             vfs_objects:
               - name: fruit
                 options:
                   - name: time machine
-                    value: 'yes'
+                    value: true
               - name: streams_xattr
             path: /srv/timemachine
             write_list: timemachine
             owner: timemachine
             group: timemachine
-            public: 'no'
-            guest_ok: 'no'
-            browseable: 'no'
+            public: false
+            guest_ok: false
+            browseable: false
             create_mask: '0600'

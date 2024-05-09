@@ -52,10 +52,10 @@
 {% if not samba_enable_netbios | bool %}
   disable netbios = yes
 {% endif %}
-  wins support = {{ samba_wins_support | ternary('yes', 'no') }}
-  local master = {{ samba_local_master | ternary('yes', 'no') }}
-  domain master = {{ samba_domain_master | ternary('yes', 'no') }}
-  preferred master = {{ samba_preferred_master | ternary('yes', 'no') }}
+  wins support = {{ samba_wins_support | bool | ternary('yes', 'no') }}
+  local master = {{ samba_local_master | bool | ternary('yes', 'no') }}
+  domain master = {{ samba_domain_master | bool | ternary('yes', 'no') }}
+  preferred master = {{ samba_preferred_master | bool | ternary('yes', 'no') }}
 
 {% if samba_load_printers %}
   load printers = yes
@@ -112,7 +112,7 @@
 {% endif %}
 {% endfor %}{% endif %}
   path = {{ share.path | default([samba_shares_root,share.name] | join('/')) }}
-  public = {{ share.public | default('no') }}
+  public = {{ share.public | bool | ternary('yes', 'no') | default('no') }}
 {% if share.valid_users is defined and share.valid_users %}
   valid users= {{ share.valid_users }}
 {% endif %}
@@ -125,23 +125,23 @@
 {% if share.user is defined and share.user %}
   force user = {{ share.user }}
 {% endif %}
-{% if share.guest_ok is defined and share.guest_ok %}
-  guest ok = {{ share.guest_ok }}
+{% if share.guest_ok is defined %}
+  guest ok = {{ share.guest_ok | bool | ternary('yes', 'no')  }}
 {% endif %}
-{% if share.browsable is defined and share.browsable %}
-  browsable = {{ share.browsable | ternary('yes', 'no') }}
+{% if share.browsable is defined %}
+  browsable = {{ share.browsable | bool | ternary('yes', 'no') }}
 {% endif %}
-{% if share.browseable is defined and share.browseable %}
-  browseable = {{ share.browseable | ternary('yes', 'no') }}
+{% if share.browseable is defined %}
+  browseable = {{ share.browseable | bool | ternary('yes', 'no') }}
 {% endif %}
-{% if share.writable is defined and share.writable %}
-  writable = {{ share.writable | ternary('yes', 'no') }}
+{% if share.writable is defined %}
+  writable = {{ share.writable | bool | ternary('yes', 'no') }}
 {% endif %}
-{% if share.writeable is defined and share.writeable %}
-  writeable = {{ share.writeable | ternary('yes', 'no') }}
+{% if share.writeable is defined %}
+  writeable = {{ share.writeable | bool | ternary('yes', 'no') }}
 {% endif %}
-{% if share.read_only is defined and share.read_only %}
-  read only = {{ share.read_only | ternary('yes', 'no') }}
+{% if share.read_only is defined %}
+  read only = {{ share.read_only | bool | ternary('yes', 'no') }}
 {% endif %}
   create mode = {{ share.create_mode | default('0664') }}
   force create mode = {{ share.force_create_mode | default('0664') }}
