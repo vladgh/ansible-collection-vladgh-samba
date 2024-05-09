@@ -69,11 +69,19 @@
           - name: TimeMachine
             comment: 'Share useable as a TimeMachine backup target on MacOS'
             vfs_objects:
+              - name: streams_xattr
               - name: fruit
                 options:
                   - name: time machine
                     value: true
-              - name: streams_xattr
+              - name: shadow_copy2
+                options:
+                  - name: shadow:snapdir
+                    value: /data/shares/.shadow_snapshots
+                  - name: shadow:sort
+                    value: desc
+                  - name: shadow:snapsharepath
+                    value: RedirectedFolders
             path: /srv/timemachine
             write_list: timemachine
             owner: timemachine
