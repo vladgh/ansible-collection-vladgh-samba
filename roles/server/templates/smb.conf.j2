@@ -107,9 +107,12 @@
 {% for obj in share.vfs_objects %}
 {% if obj.options is defined and obj.options | length > 0 %}
 {% for opt in obj.options %}
+{% if ':' in opt.name %}
+  {{ opt.name }} = {{ opt.value }}
+{% else %}
   {{ obj.name }}:{{ opt.name }} = {{ opt.value }}
-{% endfor %}
 {% endif %}
+{% endfor %}{% endif %}
 {% endfor %}{% endif %}
   path = {{ share.path | default([samba_shares_root,share.name] | join('/')) }}
   public = {{ share.public | default('no') | bool | ternary('yes', 'no') }}
