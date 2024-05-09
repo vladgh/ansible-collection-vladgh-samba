@@ -40,12 +40,12 @@ jobs:
       fail-fast: true
       matrix:
         os:
+          - ubuntu2404
           - ubuntu2204
-          - ubuntu2004
           - debian12
           - debian11
-          - fedora37
-          - fedora38
+          - fedora40
+          - fedora39
           - rockylinux8
           - rockylinux9
         scenario: ${{ fromJSON(needs.changes.outputs.scenario) }}
