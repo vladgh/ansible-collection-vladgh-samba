@@ -53,7 +53,7 @@ jobs:
         with:
           path: ansible_collections/vladgh/samba
       - name: Molecule test
-        uses: gofrolist/molecule-action@5e7cdbce9fa74cbcaf32e5dca3c09df2348fde6b # v2.7.42
+        uses: gofrolist/molecule-action@c0533e2c0455edc3760ba09a4cf8ac1b0a510918 # v2.7.43
         with:
           molecule_command: test
           molecule_options: --debug
