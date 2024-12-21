@@ -103,6 +103,7 @@ Alternatively, you can directly import the existing playbook:
 | `samba_enable_netbios`         | `true`                   | When false, the NMB daemon is disabled by setting `disable netbios` to `yes`. This overrides other NetBIOS related settings. |
 | `samba_domain_master`          | `true`                     | When true, smbd enables WAN-wide browse list collation                                                                       |
 | `samba_global_include`         | -                        | Samba-compatible configuration file with options to be loaded to [global] section (see below)                                |
+| `samba_global_config_extras`   | -                        | Samba-compatible configuration directives to be added to the [global] section (see below)                                    |
 | `samba_guest_account`          | -                        | Guest account for unknown users                                                                                              |
 | `samba_homes_include`          | -                        | Samba-compatible configuration file with options to be loaded to [homes] section (see below)                                 |
 | `samba_interfaces`             | `[]`                       | List of network interfaces used for browsing, name registration, etc.                                                        |
@@ -284,6 +285,22 @@ samba_shares:
 ```
 
 The [test playbook](molecule/default/converge.yml) has some examples.
+
+## Adding arbitrary configuration directives
+
+In addition to the option described in the section above, you can also add settings to the `[global]` section with the `samba_global_config_extras` variable.
+
+For example, to include some additional settings, set:
+
+```yaml
+samba_global_config_extras: |
+  panic action = /usr/share/samba/panic-action %d
+  obey pam restrictions = yes
+  unix password sync = yes
+  passwd program = /usr/bin/passwd %u
+  passwd chat = *Enter\snew\s*\spassword:* %n\n *Retype\snew\s*\spassword:* %n\n *password\supdated\ssuccessfully* .
+  pam password change = yes
+```
 
 ## Dependencies
 

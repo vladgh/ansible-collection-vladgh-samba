@@ -82,6 +82,13 @@
   include = {{ samba_configuration_dir }}/{{ samba_global_include | basename }}
 {% endif %}
 
+{% if samba_global_config_extras is defined and samba_global_config_extras %}
+  # User-defined extra config
+  {% for line in samba_global_config_extras | split('\n') -%}
+  {{ line | trim }}
+  {% endfor -%}
+{% endif %}
+
 {% if samba_load_homes %}
 # Make home directories accessible
 [homes]
