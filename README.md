@@ -211,6 +211,12 @@ samba_shares:
     guest_ok: true
     write_list: tomcat
     group: tomcat
+    hosts_allow:
+      - 192.168.178.
+      - 192.168.1.1
+    hosts_deny:
+      - 192.168.4.
+      - 192.168.1.2
 ```
 
 A complete overview of share options follows below. Only `name` is required, the rest is optional.
@@ -239,6 +245,8 @@ A complete overview of share options follows below. Only `name` is required, the
 | `writable`             | -                                 | Synonym for `writeable`.                                                                                     |
 | `writeable`            | -                                 | Controls whether this share is writeable for guests.                                                         |
 | `write_list`           | -                                 | Controls write access for registered users. Use the syntax of the corresponding Samba setting.               |
+| `hosts_allow`          | -                                 | Limits access to a list of IP addresses or dns names. Use the syntax of the corresponding Samba setting.     |
+| `hosts_deny`           | -                                 | Denies access for a list of IP addresses or dns names. Use the syntax of the corresponding Samba setting.    |
 
 The values for `valid_users` and `write_list` should be a comma separated list of users. Names prepended with `+` or `@` are interpreted as groups. The documentation for the [Samba configuration](https://www.samba.org/samba/docs/man/manpages-3/smb.conf.5.html) has more details on these options.
 

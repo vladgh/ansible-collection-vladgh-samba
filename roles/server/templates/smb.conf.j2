@@ -160,6 +160,12 @@
 {% if share.include_file is defined and share.include_file %}
   include = {{ samba_configuration_dir }}/{{ share.include_file | basename }}
 {% endif %}
+{% if share.hosts_allow is defined and share.hosts_allow | length > 0 %}
+  hosts allow = {{ share.hosts_allow | join(' ') }}
+{% endif %}
+{% if share.hosts_deny is defined and share.hosts_deny | length > 0 %}
+  hosts deny = {{ share.hosts_deny | join(' ') }}
+{% endif %}
 
 {% endfor %}
 {% endif %}
