@@ -90,3 +90,11 @@
             guest_ok: false
             browseable: false
             create_mask: '0600'
+          - name: NetworkRestrictedShare
+            comment: 'Only allow / deny specific hosts'
+            hosts_allow:
+              - 192.168.178.
+              - 192.168.1.1
+            hosts_deny:
+              - 192.168.4.
+              - 192.168.1.2
