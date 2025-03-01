@@ -25,7 +25,7 @@ jobs:
           commit_message: "Update galaxy.yml for ${{ env.RELEASE_VERSION }}"
           file_pattern: galaxy.yml
       - name: Publish collection
-        uses: docker://ghcr.io/artis3n/ansible_galaxy_collection:v2.10.1@sha256:512e8de7c7bb22e53ceadef302a2b181045895fa468540761d4ab1e7247ba68c
+        uses: docker://ghcr.io/artis3n/ansible_galaxy_collection:v2.11.0@sha256:5b3d08cf91d41e2090e72cf4e57d19b8b6c6a033aced59e00a185c2de1b71ef3
         with:
           api_key: '${{ secrets.ANSIBLE_GALAXY_API_KEY }}'
           galaxy_version: '${{ env.RELEASE_VERSION }}'
