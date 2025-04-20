@@ -2,6 +2,8 @@
 - name: Prepare
   hosts: all
   become: true
+  become_method: ansible.builtin.sudo
+  become_user: root
   pre_tasks:
     - name: Update apt cache
       ansible.builtin.apt:
