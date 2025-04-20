@@ -17,8 +17,9 @@ provisioner:
   log: true
   playbooks:
     prepare: prepare.yml
-  inventory:
-    host_vars:
-      # setting for the platform instance named 'instance'
-      instance:
-        ansible_user: root
+    converge: converge.yml
+  # inventory:
+  #   host_vars:
+  #     # setting for the platform instance named 'instance'
+  #     instance:
+  #       ansible_user: root

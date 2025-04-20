@@ -63,6 +63,8 @@ jobs:
           PY_COLORS: 1
           ANSIBLE_FORCE_COLOR: 1
           MOLECULE_DISTRO: ${{ matrix.os }}
+          ANSIBLE_BECOME: true
+          ANSIBLE_BECOME_METHOD: sudo
       #   continue-on-error: true
       # - name: Debugging with tmate
       #   uses: mxschmitt/action-tmate@v3.11
