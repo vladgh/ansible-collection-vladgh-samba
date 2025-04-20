@@ -19,3 +19,8 @@
       when: ansible_service_mgr == 'systemd'
       changed_when: false
       failed_when: systemctl_status.rc > 1
+    - name: Install sudo on Fedora # noqa command-instead-of-module
+      ansible.builtin.command: dnf install -y sudo
+      when: ansible_os_family == 'RedHat'
+      changed_when: false
+      failed_when: false
