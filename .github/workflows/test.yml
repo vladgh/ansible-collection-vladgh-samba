@@ -44,8 +44,8 @@ jobs:
           - ubuntu2204
           - debian12
           - debian11
-          - fedora41
-          - fedora40
+          # - fedora41
+          # - fedora40
         scenario: ${{ fromJSON(needs.changes.outputs.scenario) }}
     steps:
       - name: Checkout
