@@ -65,6 +65,7 @@ jobs:
           MOLECULE_DISTRO: ${{ matrix.os }}
           ANSIBLE_BECOME: true
           ANSIBLE_BECOME_METHOD: sudo
+          ANSIBLE_BECOME_USER: root
       #   continue-on-error: true
       # - name: Debugging with tmate
       #   uses: mxschmitt/action-tmate@v3.11
