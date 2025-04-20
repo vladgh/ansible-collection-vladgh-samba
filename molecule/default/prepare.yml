@@ -19,8 +19,30 @@
       when: ansible_service_mgr == 'systemd'
       changed_when: false
       failed_when: systemctl_status.rc > 1
-    - name: Install sudo on Fedora # noqa command-instead-of-module
-      ansible.builtin.command: dnf install -y sudo
-      when: ansible_os_family == 'RedHat'
-      changed_when: false
-      failed_when: false
+    - name: Create ansible service account
+      vars:
+        molecule_user: molecule_runner
+      block:
+        - name: Create ansible group
+          ansible.builtin.group:
+            name: "{{ molecule_user }}"
+        - name: Create ansible user
+          ansible.builtin.user:
+            name: "{{ molecule_user }}"
+            group: "{{ molecule_user }}"
+            shell: /bin/bash
+        - name: Sudoers.d directory exists
+          ansible.builtin.file:
+            path: /etc/sudoers.d
+            state: directory
+            owner: root
+            group: root
+            mode: "0751"
+        - name: Ansible user has sudo
+          ansible.builtin.copy:
+            content: |
+              {{ molecule_user }}  ALL=(ALL)  NOPASSWD: ALL
+            dest: /etc/sudoers.d/ansible
+            owner: root
+            group: root
+            mode: "0600"
