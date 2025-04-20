@@ -17,3 +17,8 @@ provisioner:
   log: true
   playbooks:
     prepare: prepare.yml
+    converge: converge.yml
+  inventory:
+    host_vars:
+      instance:
+        ansible_user: root
