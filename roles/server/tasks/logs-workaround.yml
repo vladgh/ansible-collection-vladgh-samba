@@ -3,6 +3,11 @@
 # https://lists.samba.org/archive/samba-technical/2023-December/138624.html
 # 24.04 has 2:4.19.5+dfsg-4ubuntu9, fix in 2:4.20.2+dfsg-3
 
+- name: Stat /usr/lib/systemd/system/smbd.service
+  ansible.builtin.stat:
+    path: /usr/lib/systemd/system/smbd.service
+  register: unit_f
+
 - name: "Workaround Referenced but unset environment variable evaluates to an empty string: SMBDOPTIONS"
   ansible.builtin.replace:
     path: /usr/lib/systemd/system/smbd.service
@@ -13,6 +18,8 @@
   notify:
     - Reload systemd
     - Restart SMB service
+  when:
+    - unit_f.stat.exists
 
 - name: "Workaround Referenced but unset environment variable evaluates to an empty string: NMBDOPTIONS"
   ansible.builtin.replace:
@@ -24,3 +31,5 @@
   notify:
     - Reload systemd
     - Restart NMB service
+  when:
+    - unit_f.stat.exists
