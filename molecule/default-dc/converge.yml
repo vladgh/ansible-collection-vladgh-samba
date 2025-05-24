@@ -1,0 +1,94 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  tasks:
+    - name: Add test users
+      ansible.builtin.user:
+        name: "{{ item }}"
+        groups: users
+        append: true
+      loop:
+        - usr1
+        - usr2
+        - timemachine
+    - name: Include role
+      ansible.builtin.include_role:
+        name: vladgh.samba.server
+      vars:
+        samba_role: dc_primary
+        samba_netbios_name: DC1
+        samba_server_string: DC1
+        samba_realm: SAMDOM.EXAMPLE.COM
+        samba_workgroup: SAMDOM
+        samba_dc_admin_pass: dc_admin_pass
+        samba_global_include: global-include.conf
+        samba_load_homes: true
+        samba_load_printers: false
+        samba_create_varwww_symlinks: true
+        samba_log: /var/log/samba.log
+        samba_log_size: 60000
+        samba_log_level: '3 passdb:5 auth:10 winbind:2 '
+        samba_map_to_guest: Never
+        samba_users:
+          - name: usr1
+            password: usr1
+          - name: usr2
+            password: usr2
+          - name: timemachine
+            password: timemachine
+        samba_username_map:
+          - from: 'User Two'
+            to: usr2
+        samba_shares_root: /srv/samba
+        samba_shares:
+          - name: restrictedshare
+          - name: privateshare
+            comment: 'Only readable/writeable by usr1'
+            valid_users: usr1
+            write_list: usr1
+            group: usr1
+            browseable: false
+          - name: protectedshare
+            public: true
+            comment: 'Public, but only writeable by usr2'
+            write_list: usr2
+            user: usr2
+            group: users
+            browseable: true
+            include_file: protectedshare-include.conf
+          - name: publicshare
+            comment: 'Public share, writeable by all members of group ‘users’'
+            public: true
+            write_list: +users
+            group: users
+            browseable: true
+          - name: guestshare
+            comment: 'Share accessible for guests'
+            guest_ok: true
+            writeable: true
+            browseable: true
+          - name: TimeMachine
+            comment: 'Share useable as a TimeMachine backup target on MacOS'
+            vfs_objects:
+              - name: streams_xattr
+              - name: fruit
+                options:
+                  - name: time machine
+                    value: true
+              - name: shadow_copy2
+                options:
+                  - name: shadow:snapdir
+                    value: /data/shares/.shadow_snapshots
+                  - name: shadow:sort
+                    value: desc
+                  - name: shadow:snapsharepath
+                    value: RedirectedFolders
+            path: /srv/timemachine
+            write_list: timemachine
+            owner: timemachine
+            group: timemachine
+            public: false
+            guest_ok: false
+            browseable: false
+            create_mask: '0600'
