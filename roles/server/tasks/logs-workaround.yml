@@ -1,0 +1,26 @@
+---
+# https://bugs-devel.debian.org/cgi-bin/bugreport.cgi?bug=1073969
+# https://lists.samba.org/archive/samba-technical/2023-December/138624.html
+# 24.04 has 2:4.19.5+dfsg-4ubuntu9, fix in 2:4.20.2+dfsg-3
+
+- name: "Workaround Referenced but unset environment variable evaluates to an empty string: SMBDOPTIONS"
+  ansible.builtin.replace:
+    path: /usr/lib/systemd/system/smbd.service
+    regexp: '^ExecStart=/usr/sbin/smbd --foreground --no-process-group \$SMBDOPTIONS'
+    replace: 'ExecStart=/usr/sbin/smbd --foreground --no-process-group ${SMBDOPTIONS:-}'
+    mode: '0644'
+    owner: root
+  notify:
+    - Reload systemd
+    - Restart SMB service
+
+- name: "Workaround Referenced but unset environment variable evaluates to an empty string: NMBDOPTIONS"
+  ansible.builtin.replace:
+    path: /usr/lib/systemd/system/nmbd.service
+    regexp: '^ExecStart=/usr/sbin/nmbd --foreground --no-process-group \$NMBDOPTIONS'
+    replace: 'ExecStart=/usr/sbin/nmbd --foreground --no-process-group \${NMBDOPTIONS:-}'
+    mode: '0644'
+    owner: root
+  notify:
+    - Reload systemd
+    - Restart NMB service

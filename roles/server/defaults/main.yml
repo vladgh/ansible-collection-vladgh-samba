@@ -1,4 +1,8 @@
 ---
+samba_role: 'fileserver'
+# samba_role: 'dc_primary'
+# samba_role: 'dc_secondary'
+
 samba_workgroup: 'WORKGROUP'
 samba_server_string: 'Fileserver %m'
 samba_log_size: 5000
@@ -16,6 +20,12 @@ samba_shares_root: '/srv/shares'
 samba_manage_directories: true
 samba_shares: []
 samba_users: []
+# samba_server_min_protocol: SMB3
+# samba_smb_encrypt: mandatory
+# Turn off NTLMv1
+# samba_ntlm_auth: mschapv2-and-ntlmv2-only
+# Turning off null session connections
+# samba_restrict_anonymous: 2
 
 samba_enable_netbios: true
 samba_wins_support: true
@@ -23,3 +33,47 @@ samba_local_master: true
 samba_domain_master: true
 samba_preferred_master: true
 samba_mitigate_cve_2017_7494: true
+
+# Domain Controller role
+# samba_workgroup: 'REALM'
+samba_realm: REALM.INTERNAL
+samba_dns_servers: 192.168.1.1
+samba_dns_forwarder: 1.1.1.1
+samba_dc_fqdn: dc1.realm.internal
+# DC admin user: Administrator
+samba_dc_admin_pass: dc_admin
+
+# https://wiki.samba.org/index.php/Samba_AD_DC_Port_Usage
+samba_ufw: false
+samba_ufw_if: eth0
+## only affect incoming traffic
+# samba_ufw_default_policy: allow
+samba_ufw_default_policy: deny
+samba_ufw_default_logging: medium
+# trusted sources for all ports
+samba_ufw_access:
+  - 10.0.0.0/8
+  - 172.16.0.0/12
+  - 192.168.0.0/16
+samba_ufw_access_with_log: []
+# opened ports for all sources
+samba_ufw_allow_ports_in:
+  - '53'
+  - '88'
+  - '445'
+  - '636'
+  - '3269'
+  - '49152-65535'
+samba_ufw_out_logging: false
+samba_ufw_allow_ports_out:
+  - '53'
+  - '123'
+  ## email/TLS?
+  ## web (some apt updates are on http)
+  - '80'
+  - '443'
+# web proxy? must also be configured in /etc/environment
+samba_proxy_ip:
+samba_proxy_port:
+
+samba_ufw_allow_if_out: []

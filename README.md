@@ -2,7 +2,7 @@
 
 ![Test Status](https://github.com/vladgh/ansible-collection-vladgh-samba/actions/workflows/test.yml/badge.svg)
 
-An Ansible collection for setting up Samba as a file server. It is tested on Ubuntu, Debian, CentOS and Arch Linux. Specifically, the responsibilities of this collection are to:
+An Ansible collection for setting up Samba as a file server or a domain controller (primary or secondaries). It is tested on Ubuntu, Debian, CentOS and Arch Linux. Specifically, the responsibilities of this collection are to:
 
 - Install the necessary packages
 - Create share directories
@@ -287,7 +287,8 @@ The [test playbook](molecule/default/converge.yml) has some examples.
 
 ## Dependencies
 
-N/A
+* Fileserver: N/A
+* Domain Controller: DNS must be setup separately and match the target realm, domain/subdomain. NTP must be setup separately.
 
 ## Testing
 

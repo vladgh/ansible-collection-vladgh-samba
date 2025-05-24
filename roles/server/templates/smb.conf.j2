@@ -25,6 +25,7 @@
   # Authentication
   security = {{ samba_security }}
   passdb backend = {{ samba_passdb_backend }}
+  password hash userPassword schemes = CryptSHA256 CryptSHA512
   map to guest = {{ samba_map_to_guest }}
 {% if samba_guest_account  is defined and samba_guest_account %}
   guest account = {{ samba_guest_account }}
@@ -43,6 +44,18 @@
   server max protocol = {{ samba_server_max_protocol }}
 
 {% endif %}
+{% if samba_smb_encrypt is defined and samba_smb_encrypt %}
+  smb encrypt = {{ samba_smb_encrypt }}
+
+{% endif %}
+{% if samba_ntlm_auth is defined and samba_ntlm_auth %}
+  ntlm auth = {{ samba_ntlm_auth }}
+
+{% endif %}
+{% if samba_restrict_anonymous is defined and samba_restrict_anonymous %}
+  restrict anonymous = {{ samba_restrict_anonymous }}
+
+{% endif %}
 {% if samba_interfaces | length > 0 %}
   bind interfaces only = yes
   interfaces = 127.0.0.1 {{ samba_interfaces | join(' ') }}
@@ -51,11 +64,13 @@
   # Name resolution
 {% if not samba_enable_netbios | bool %}
   disable netbios = yes
+  smb ports = 445
 {% endif %}
   wins support = {{ samba_wins_support | bool | ternary('yes', 'no') }}
   local master = {{ samba_local_master | bool | ternary('yes', 'no') }}
   domain master = {{ samba_domain_master | bool | ternary('yes', 'no') }}
   preferred master = {{ samba_preferred_master | bool | ternary('yes', 'no') }}
+  rpc server dynamic port range = 50000-55000
 
 {% if samba_load_printers %}
   load printers = yes
@@ -80,6 +95,10 @@
 
 {% if samba_global_include is defined and samba_global_include %}
   include = {{ samba_configuration_dir }}/{{ samba_global_include | basename }}
+{% endif %}
+{% if samba_shares is defined and samba_shares | length > 0 and samba_role == 'dc_primary' %}
+  # https://wiki.samba.org/index.php/Setting_up_RFC2307_in_AD - recommended only if more shares than netlogon+sysvol on dc.
+  idmap_ldb:use rfc2307 = yes
 {% endif %}
 
 {% if samba_load_homes %}
@@ -153,6 +172,27 @@
 {% if share.include_file is defined and share.include_file %}
   include = {{ samba_configuration_dir }}/{{ share.include_file | basename }}
 {% endif %}
+{% if share.audit is defined and share.audit | bool %}
+  # SambaAudit configuration
+  # https://www.samba.org/samba/docs/current/man-html/vfs_full_audit.8.html
+  # https://unix.stackexchange.com/questions/658691/samba-has-a-module-vfs-full-audit-what-does-each-object-actually-mean-within-th
+  # https://access.redhat.com/solutions/7011345
+  vfs object = full_audit
+  full_audit:prefix = %u|%I|%S
+  full_audit:success = mkdirat renameat unlinkat create_file
+  full_audit:failure = mkdirat renameat unlinkat create_file
+  full_audit:facility = local5
+  full_audit:priority = notice
+{% endif %}
 
 {% endfor %}
+{% endif %}
+{% if samba_role == 'dc_primary' or samba_role == 'dc_secondary' %}
+[netlogon]
+  path = /var/lib/samba/sysvol/{{ smb_realm }}/scripts
+  read only = No
+
+[sysvol]
+  path = /var/lib/samba/sysvol
+  read only = No
 {% endif %}

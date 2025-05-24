@@ -1,0 +1,117 @@
+---
+# https://wiki.samba.org/index.php/Setting_up_Samba_as_an_Active_Directory_Domain_Controller
+# https://github.com/bitfinity-nl/role-samba4-primary-ad-dc/
+
+- name: Check local hostname resolution
+  ansible.builtin.command:
+    cmd: "dig {{ samba_dc_fqdn }}"
+  changed_when: false
+
+- name: Remove existing config file
+  ansible.builtin.command:
+    cmd: smbd -b | grep "CONFIGFILE"
+  changed_when: false
+
+- name: Check OS if is already DC
+  ansible.builtin.command:
+    cmd: "samba-tool domain info {{ ansible_default_ipv4.address }}"
+  register: smb_dc_result
+  changed_when: false
+  failed_when: false
+
+- name: Preseed Kerberos version 5
+  ansible.builtin.shell:  # noqa no-changed-when
+    cmd: |
+      set -o pipefail
+      echo krb5-config krb5-config/default_realm string {{ smb_realm }} | sudo debconf-set-selections
+      echo krb5-config krb5-config/add_servers_realm string {{ smb_realm }} | sudo debconf-set-selections
+      echo libpam-runtime  libpam-runtime/profiles multiselect     unix, winbind, systemd, mkhomedir | sudo debconf-set-selections
+  when:
+    - smb_dc_result.failed | bool
+
+- name: Install Samba DC packages
+  ansible.builtin.package:
+    name: "{{ samba_dc_packages | default([]) }}"
+    state: present
+
+- name: Host not already DC
+  when:
+    - smb_dc_result.failed | bool
+  block:
+    - name: "Disable Services"
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: stopped
+        enabled: no
+      loop:
+        - samba-ad-dc.service
+        - smbd.service
+        - nmbd.service
+        - winbind.service
+        - systemd-resolved
+    - name: Backup existing configuration files
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "{{ item }}.orig"
+        mode: '0600'
+        remote_src: yes
+        force: no
+      loop:
+        - /etc/samba/smb.conf
+        - /etc/krb5.conf
+    - name: Remove /etc/samba/smb.conf
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/samba/smb.conf
+        - /etc/krb5.conf
+    - name: Start domain provisioning
+      ansible.builtin.command:  # noqa no-changed-when
+        cmd: |
+          samba-tool domain provision --server-role=dc --use-rfc2307
+            --dns-backend=SAMBA_INTERNAL --realm={{ samba_dc_realm }}
+            --domain={{ samba_workgroup }} --adminpass={{ samba_dc_admin_password }}
+      register: provision
+
+- name: Symlink /var/lib/samba/private/krb5.conf to /etc/krb5.conf
+  ansible.builtin.file:
+    # or path matching samba-tool output
+    src: /var/lib/samba/private/krb5.conf
+    dest: /etc/krb5.conf
+    state: link
+
+- name: Enable DC Services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+    masked: no
+  loop:
+    - samba-ad-dc.service
+
+- name: Ensure Mount options have acl and xattr
+  ansible.posix.mount:
+    path: "{{ item }}"
+    # src: /dev/sr0
+    # fstype: iso9660
+    opts: acl,user_xattr,barrier=1
+    state: present
+  loop:
+    - /
+    - /home
+  when: false
+
+# Optional: Create a reverse zone
+
+- name: Get file server info
+  ansible.builtin.command:
+    cmd: smbclient -L localhost -N
+  changed_when: false
+  register: smbclient1
+- name: Verify file server shares
+  ansible.builtin.assert:
+    that:
+      - "'netlogon' in smbclient1.stdout"
+      - "'sysvol' in smbclient1.stdout"
+      - "'IPC$' in smbclient1.stdout"

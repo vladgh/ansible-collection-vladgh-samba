@@ -6,6 +6,17 @@ samba_packages:
 samba_vfs_packages:
   - samba-vfs-modules
 
+samba_dc_packages:
+  - acl
+  - attr
+  - winbind
+  - libpam-winbind
+  - libnss-winbind
+  - krb5-config
+  - krb5-user
+  - dnsutils
+  - python3-setproctitle
+
 samba_configuration_dir: /etc/samba
 samba_configuration: "{{ samba_configuration_dir }}/smb.conf"
 samba_username_map_file: "{{ samba_configuration_dir }}/smbusers"

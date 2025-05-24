@@ -1,0 +1,20 @@
+---
+# https://wiki.samba.org/index.php/Joining_a_Samba_DC_to_an_Existing_Active_Directory
+
+- name: Install Samba DC packages
+  ansible.builtin.package:
+    name: "{{ samba_dc_packages | default([]) }}"
+    state: present
+
+- name: Symlink /var/lib/samba/private/krb5.conf to /etc/krb5.conf
+  ansible.builtin.blockinfile:
+    dest: /etc/krb5.conf
+    block: |
+      [libdefaults]
+      dns_lookup_realm = false
+      dns_lookup_kdc = true
+      default_realm = {{ samba_realm }}
+    mode: '0644'
+
+# kinit administrator
+# samba-tool domain join samdom.example.com DC -k yes
