@@ -322,6 +322,11 @@ The default config will start an Ubuntu 22.04 container. Choose another distro b
 MOLECULE_DISTRO=debian11 molecule test
 ```
 
+## Troubleshooting and Known issues
+
+* "INTERNAL ERROR: Security context active token stack underflow! in  () () pid 41380 (4.19.5-Ubuntu)":
+Samba Domain Controller provisioning has issues running inside unprivileged lxc container. Workaround is to use privileged container (https://forum.proxmox.com/threads/error-samba-ad-provisioning-into-lxc-container.33475/, https://github.com/turnkeylinux/tracker/issues/1666). Alternate solutions that may apply or not, either use nfs attributes to store acl (https://lists.samba.org/archive/samba/2021-February/234326.html), either tweak samba uid along alternate filesystem like btrfs (https://github.com/lxc/lxc/issues/2708#issuecomment-473466062).
+
 ## Changelog & Releases
 
 This repository keeps a change log using [GitHub's releases](https://github.com/vladgh/ansible-collection-vladgh-samba/releases) functionality.
