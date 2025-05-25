@@ -23,3 +23,4 @@
 .env
 .cache
 *.retry
+.ansible
