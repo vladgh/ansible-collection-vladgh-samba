@@ -41,7 +41,8 @@ samba_dns_servers: 192.168.1.1
 samba_dns_forwarder: 1.1.1.1
 samba_dc_fqdn: dc1.realm.internal
 # DC admin user: Administrator
-samba_dc_admin_pass: dc_admin
+samba_dc_admin_password: dc_admin
+samba_domain_provision_extra_args: ''
 
 # https://wiki.samba.org/index.php/Samba_AD_DC_Port_Usage
 samba_ufw: false

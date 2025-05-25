@@ -23,20 +23,28 @@
   ansible.builtin.shell:  # noqa no-changed-when
     cmd: |
       set -o pipefail
-      echo krb5-config krb5-config/default_realm string {{ smb_realm }} | sudo debconf-set-selections
-      echo krb5-config krb5-config/add_servers_realm string {{ smb_realm }} | sudo debconf-set-selections
+      echo krb5-config krb5-config/default_realm string {{ samba_realm }} | sudo debconf-set-selections
+      echo krb5-config krb5-config/add_servers_realm string {{ samba_realm }} | sudo debconf-set-selections
       echo libpam-runtime  libpam-runtime/profiles multiselect     unix, winbind, systemd, mkhomedir | sudo debconf-set-selections
+  args:
+    executable: /bin/bash
   when:
-    - smb_dc_result.failed | bool
+    - smb_dc_result.rc != 0
 
 - name: Install Samba DC packages
   ansible.builtin.package:
     name: "{{ samba_dc_packages | default([]) }}"
     state: present
 
+- name: Import workaround-unprivileged-lxc
+  ansible.builtin.import_tasks: workaround-unprivileged-lxc.yml
+  when:
+    - ansible_virtualization_type is defined
+    - ansible_virtualization_type == "lxc"
+
 - name: Host not already DC
   when:
-    - smb_dc_result.failed | bool
+    - smb_dc_result.rc != 0
   block:
     - name: "Disable Services"
       ansible.builtin.systemd:
@@ -49,6 +57,10 @@
         - nmbd.service
         - winbind.service
         - systemd-resolved
+    - name: Stat /etc/samba/smb.conf
+      ansible.builtin.stat:
+        path: /etc/samba/smb.conf
+      register: conf1
     - name: Backup existing configuration files
       ansible.builtin.copy:
         src: "{{ item }}"
@@ -59,6 +71,8 @@
       loop:
         - /etc/samba/smb.conf
         - /etc/krb5.conf
+      when:
+        - conf1.stat.exists
     - name: Remove /etc/samba/smb.conf
       ansible.builtin.file:
         path: "{{ item }}"
@@ -70,9 +84,11 @@
       ansible.builtin.command:  # noqa no-changed-when
         cmd: |
           samba-tool domain provision --server-role=dc --use-rfc2307
-            --dns-backend=SAMBA_INTERNAL --realm={{ samba_dc_realm }}
-            --domain={{ samba_workgroup }} --adminpass={{ samba_dc_admin_password }}
+            --dns-backend=SAMBA_INTERNAL --realm={{ samba_realm }}
+            --domain={{ samba_workgroup }} --adminpass="{{ samba_dc_admin_password }}"
+            {{ samba_domain_provision_extra_args }}
       register: provision
+      no_log: "{{ samba_no_log | default(true) }}"
 
 - name: Symlink /var/lib/samba/private/krb5.conf to /etc/krb5.conf
   ansible.builtin.file:

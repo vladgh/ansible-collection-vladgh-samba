@@ -1,0 +1,25 @@
+---
+
+- name: Make Samba Use UID 655+ Instead of 3000000+
+  ansible.builtin.copy:
+    content: |
+      dn: CN=CONFIG
+      cn: CONFIG
+      lowerBound: 655
+      upperBound: 65533
+      
+      dn: @INDEXLIST
+      @IDXATTR: xidNumber
+      @IDXATTR: objectSid
+      
+      dn: CN=S-1-5-32-544
+      cn: S-1-5-32-544
+      objectClass: sidMap
+      objectSid: S-1-5-32-544
+      type: ID_TYPE_BOTH
+      xidNumber: 655
+      distinguishedName: CN=S-1-5-32-544
+    dest: /usr/share/samba/setup/idmap_init.ldif
+    mode: '0644'
+    owner: root
+    backup: true
