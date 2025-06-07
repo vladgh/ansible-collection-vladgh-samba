@@ -26,5 +26,23 @@
   when:
     - samba_role == 'dc_primary'
 
+- name: DC (primary or secondary)
+  when:
+    - samba_role == 'dc_primary' or samba_role == 'dc_secondary'
+  block:
+    - name: Import dc_configure
+      ansible.builtin.import_tasks: dc_configure.yml
+    - name: Import dc_krbtgt
+      ansible.builtin.import_tasks: dc_krbtgt.yml
+
 - name: Import Logs workaround
   ansible.builtin.import_tasks: logs-workaround.yml
+
+- name: DC Admin password generated
+  ansible.builtin.debug:
+    var: samba_dc_admin_password
+  when:
+    - samba_role == 'dc_primary'
+    - samba_dc_admin_password is not defined
+    - smb_dc_result.rc is defined
+    - smb_dc_result.rc != 0

@@ -41,8 +41,25 @@ samba_dns_servers: 192.168.1.1
 samba_dns_forwarder: 1.1.1.1
 samba_dc_fqdn: dc1.realm.internal
 # DC admin user: Administrator
-samba_dc_admin_password: dc_admin
+# if undefined, a random password will be generated
+# samba_dc_admin_password: ''
+samba_dc_shares_audit: true
 samba_domain_provision_extra_args: ''
+samba_gpo_enable: true
+samba_gpo_admx_url: https://download.microsoft.com/download/9/5/b/95be347e-c49e-4ede-a205-467c85eb1674/Administrative%20Templates%20(.admx)%20for%20Windows%2011%20Sep%202024%20Update.msi  # noqa yaml[line-length]
+samba_gpo_admx_dir: 'Program Files/Microsoft Group Policy/Windows 11 Sep 2024 Update (24H2)'
+samba_dc_users:
+  - { login: user1 }
+  - { login: user2 }
+samba_custom_conf:
+  - { s: global,
+      o: 'netbios name',
+      v: 'Domain Controller'
+  }
+  - { s: global,
+      o: 'server string',
+      v: 'Domain Controller'
+  }
 
 # https://wiki.samba.org/index.php/Samba_AD_DC_Port_Usage
 samba_ufw: false

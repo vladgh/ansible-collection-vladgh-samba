@@ -14,3 +14,7 @@
     name: "{{ nmb_service }}"
     state: restarted
   when: samba_enable_netbios | bool
+
+- name: Restart samba-ad-dc
+  ansible.builtin.service:
+    name: samba-ad-dc

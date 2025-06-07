@@ -7,11 +7,11 @@
       cn: CONFIG
       lowerBound: 655
       upperBound: 65533
-      
+
       dn: @INDEXLIST
       @IDXATTR: xidNumber
       @IDXATTR: objectSid
-      
+
       dn: CN=S-1-5-32-544
       cn: S-1-5-32-544
       objectClass: sidMap

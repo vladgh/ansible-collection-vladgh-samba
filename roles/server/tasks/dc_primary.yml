@@ -80,15 +80,26 @@
       loop:
         - /etc/samba/smb.conf
         - /etc/krb5.conf
+    - name: Set fact dc admin password
+      ansible.builtin.set_fact:
+        _samba_dc_admin_password: "{{ lookup('ansible.builtin.password', '/dev/null', length=64) }}"
+      when:
+        - samba_dc_admin_password | length == 0
     - name: Start domain provisioning
       ansible.builtin.command:  # noqa no-changed-when
         cmd: |
           samba-tool domain provision --server-role=dc --use-rfc2307
             --dns-backend=SAMBA_INTERNAL --realm={{ samba_realm }}
-            --domain={{ samba_workgroup }} --adminpass="{{ samba_dc_admin_password }}"
+            --domain={{ samba_workgroup }} --adminpass="{{ samba_dc_admin_password | default(_samba_dc_admin_password) }}"
             {{ samba_domain_provision_extra_args }}
       register: provision
       no_log: "{{ samba_no_log | default(true) }}"
+    - name: Save admin password for further commands
+      ansible.builtin.lineinfile:
+        line: "{{ samba_dc_admin_password | default(_samba_dc_admin_password) }}"
+        path: /etc/samba/.dc_admin_pass
+        mode: '0400'
+        owner: root
 
 - name: Symlink /var/lib/samba/private/krb5.conf to /etc/krb5.conf
   ansible.builtin.file:
@@ -96,6 +107,25 @@
     src: /var/lib/samba/private/krb5.conf
     dest: /etc/krb5.conf
     state: link
+
+- name: Add audit option for DC shares
+  ansible.builtin.blockinfile:
+    path: /etc/samba/smb.conf
+    mode: '0644'
+    owner: root
+    block: |
+              vfs object = full_audit
+              full_audit:prefix = %u|%I|%S
+              full_audit:success = mkdirat renameat unlinkat create_file
+              full_audit:failure = mkdirat renameat unlinkat create_file
+              full_audit:facility = local5
+              full_audit:priority = notice
+    insertafter: "{{ item }}"
+  loop:
+    - '^\[sysvol\]'
+    - '^\[netlogon\]'
+  when:
+    - samba_dc_shares_audit | bool
 
 - name: Enable DC Services
   ansible.builtin.systemd:
@@ -131,3 +161,18 @@
       - "'netlogon' in smbclient1.stdout"
       - "'sysvol' in smbclient1.stdout"
       - "'IPC$' in smbclient1.stdout"
+
+- name: Import dc_gpo
+  ansible.builtin.import_tasks: dc_gpo.yml
+  when:
+    - samba_gpo_enable | bool
+
+- name: Import dc_users
+  ansible.builtin.import_tasks: dc_users.yml
+
+- name: Install ldap-utils for troubleshooting
+  ansible.builtin.package:
+    name:
+      - ldap-utils
+      - libsasl2-modules-gssapi-mit
+    state: present

@@ -1,0 +1,16 @@
+---
+
+- name: Get current users
+  ansible.builtin.command:
+    cmd: samba-tool user list
+  changed_when: false
+  become: true
+  register: smb_users
+
+- name: Import dc_create_user
+  ansible.builtin.include_tasks: dc_create_user.yml
+  vars:
+    login: "{{ item.login }}"
+    password: "{{ item.password | default('--random-password') }}"
+    extras: "{{ item.extras | default('') }}"
+  loop: "{{ samba_dc_users }}"

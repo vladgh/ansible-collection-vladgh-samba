@@ -1,0 +1,64 @@
+---
+# https://wiki.samba.org/index.php/Group_Policy
+
+- name: Enable Group Policies Objects aka GPO
+  community.general.ini_file:
+    path: /etc/samba/smb.conf
+    section: global
+    option: apply group policies
+    value: yes
+    mode: '0644'
+    owner: root
+    backup: true
+  notify:
+    - Restart samba-ad-dc
+
+- name: Load Samba ADMX
+  ansible.builtin.command:
+    cmd: "samba-tool gpo admxload -U Administrator"
+  environment:
+    PASSWD_FILE: /etc/samba/.dc_admin_pass
+  args:
+    creates: /var/lib/samba/sysvol/smb.internal/Policies/PolicyDefinitions/samba.admx
+  become: true
+
+- name: Get Microsoft ADMX
+  ansible.builtin.get_url:
+    url: "{{ samba_gpo_admx_url }}"
+    dest: "/tmp/{{ samba_gpo_admx_url | basename }}"
+    mode: '0644'
+    owner: root
+  # Request failed: <urlopen error Tunnel connection failed: 500 Unable to connect>
+  when:
+    - false
+    - samba_gpo_admx_url | length > 0
+
+- name: Ensure msitools is present
+  ansible.builtin.package:
+    name: msitools
+    state: present
+
+- name: Extract Microsoft ADMX
+  ansible.builtin.command:
+    cmd: "msiextract '/tmp/{{ samba_gpo_admx_url | basename | replace('%20', ' ') }}'"
+  args:
+    chdir: /tmp
+    creates: "/tmp/{{ samba_gpo_admx_dir }}/PolicyDefinitions"
+  when:
+    - samba_gpo_admx_url | length > 0
+
+- name: Load Microsoft ADMX
+  ansible.builtin.command:
+    cmd: "samba-tool gpo admxload -U Administrator --admx-dir='/tmp/{{ samba_gpo_admx_dir }}/PolicyDefinitions/'"
+  environment:
+    PASSWD_FILE: /etc/samba/.dc_admin_pass
+  args:
+    creates: /var/lib/samba/sysvol/smb.internal/Policies/PolicyDefinitions/windowsserver.admx
+  become: true
+  when:
+    - samba_gpo_admx_url | length > 0
+
+- name: Ensure python3-requests is present for samba-gpupdate
+  ansible.builtin.package:
+    name: python3-requests
+    state: present
