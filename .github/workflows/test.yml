@@ -16,7 +16,7 @@ on:
 jobs:
   changes:
     name: Detect file changes
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     outputs:
       scenario: ${{ steps.filter.outputs.changes }}
     steps:
@@ -33,7 +33,7 @@ jobs:
               - .github/workflows/test.yml
   test:
     name: "Test scenario ${{ matrix.scenario }} on ${{ matrix.os }}"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: changes
     if: ${{ needs.changes.outputs.scenario != '[]' && needs.changes.outputs.scenario != '' }}
     strategy:
@@ -44,8 +44,8 @@ jobs:
           - ubuntu2204
           - debian12
           - debian11
-          - fedora40
-          - fedora39
+          - fedora42
+          - fedora41
         scenario: ${{ fromJSON(needs.changes.outputs.scenario) }}
     steps:
       - name: Checkout
@@ -53,7 +53,7 @@ jobs:
         with:
           path: ansible_collections/vladgh/samba
       - name: Molecule test
-        uses: gofrolist/molecule-action@07bf9b255f1f5d3fd2f492a468e0dc53abe6ea12 # v2.7.46
+        uses: gofrolist/molecule-action@4ce2d77cacc6d60862d7ca2da84e6059043770ed # v2.7.63
         with:
           molecule_command: test
           molecule_options: --debug

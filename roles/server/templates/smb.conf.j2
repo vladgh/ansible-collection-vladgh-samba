@@ -2,7 +2,7 @@
 
 [global]
   # Server information
-  netbios name = {% if samba_netbios_name is defined and samba_netbios_name %}{{ samba_netbios_name }}{% else %}{{ ansible_hostname }}{% endif +%}
+  netbios name = {% if samba_netbios_name is defined and samba_netbios_name %}{{ samba_netbios_name }}{% else %}{{ ansible_facts['hostname'] }}{% endif +%}
   mdns name = {% if samba_mdns_name is defined and samba_mdns_name %}{{ samba_mdns_name }}{% else %}netbios{% endif +%}
   workgroup = {{ samba_workgroup }}
 {% if samba_realm is defined and samba_realm %}
@@ -101,6 +101,13 @@
   idmap_ldb:use rfc2307 = yes
 {% endif %}
 
+{% if samba_global_config_extras is defined and samba_global_config_extras %}
+  # User-defined extra config
+  {% for line in samba_global_config_extras | split('\n') -%}
+  {{ line | trim }}
+  {% endfor -%}
+{% endif %}
+
 {% if samba_load_homes %}
 # Make home directories accessible
 [homes]
@@ -136,7 +143,7 @@
   path = {{ share.path | default([samba_shares_root,share.name] | join('/')) }}
   public = {{ share.public | default('no') | bool | ternary('yes', 'no') }}
 {% if share.valid_users is defined and share.valid_users %}
-  valid users= {{ share.valid_users }}
+  valid users = {{ share.valid_users }}
 {% endif %}
 {% if share.write_list is defined and share.write_list %}
   write list = {{ share.write_list }}
@@ -171,6 +178,12 @@
   force directory mode = {{ share.force_directory_mode | default('0775') }}
 {% if share.include_file is defined and share.include_file %}
   include = {{ samba_configuration_dir }}/{{ share.include_file | basename }}
+{% endif %}
+{% if share.hosts_allow is defined and share.hosts_allow | length > 0 %}
+  hosts allow = {{ share.hosts_allow | join(' ') }}
+{% endif %}
+{% if share.hosts_deny is defined and share.hosts_deny | length > 0 %}
+  hosts deny = {{ share.hosts_deny | join(' ') }}
 {% endif %}
 {% if share.audit is defined and share.audit | bool %}
   # SambaAudit configuration

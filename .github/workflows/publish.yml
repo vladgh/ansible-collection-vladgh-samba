@@ -7,7 +7,7 @@ on:
 jobs:
   publish:
     name: Publish collection to Ansible Galaxy
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -19,13 +19,13 @@ jobs:
         run: |
           sed -Ei "s/^version: .*/version: ${{ env.RELEASE_VERSION }}/" galaxy.yml
       - name: Commit galaxy.yml
-        uses: stefanzweifel/git-auto-commit-action@8621497c8c39c72f3e2a999a26b4ca1b5058a842 # v5.0.1
+        uses: stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403 # v5.2.0
         with:
           branch: main
           commit_message: "Update galaxy.yml for ${{ env.RELEASE_VERSION }}"
           file_pattern: galaxy.yml
       - name: Publish collection
-        uses: docker://ghcr.io/artis3n/ansible_galaxy_collection:v2.10.1@sha256:512e8de7c7bb22e53ceadef302a2b181045895fa468540761d4ab1e7247ba68c
+        uses: docker://ghcr.io/artis3n/ansible_galaxy_collection:v2.11.0@sha256:5b3d08cf91d41e2090e72cf4e57d19b8b6c6a033aced59e00a185c2de1b71ef3
         with:
           api_key: '${{ secrets.ANSIBLE_GALAXY_API_KEY }}'
           galaxy_version: '${{ env.RELEASE_VERSION }}'
