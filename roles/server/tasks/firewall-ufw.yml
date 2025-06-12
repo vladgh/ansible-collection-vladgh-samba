@@ -1,0 +1,91 @@
+---
+
+# - include: logging.yml
+
+- name: Install ufw
+  ansible.builtin.package:
+    name: ufw
+    state: present
+  register: pkg_result
+  until: pkg_result is success
+
+- name: UFW | RedHat | requires ufw to be enabled before configuration
+  community.general.ufw:
+    state: enabled
+  when: ansible_os_family == 'RedHat'
+
+- name: UFW | ensure logging medium is enabled
+  community.general.ufw:
+    logging: "{{ samba_ufw_default_logging }}"
+
+- name: UFW | always allow ssh
+  community.general.ufw:
+    rule: allow
+    name: "{{ ufw_rulename_ssh }}"
+    log: yes
+
+- name: UFW | always allow samba
+  community.general.ufw:
+    rule: allow
+    name: Samba
+    log: yes
+
+- name: UFW | allow access from defined networks
+  community.general.ufw:
+    rule: "allow"
+    src: "{{ item }}"
+  with_items: "{{ samba_ufw_access }}"
+
+- name: UFW | allow access from defined networks - with logging
+  community.general.ufw:
+    rule: "allow"
+    src: "{{ item }}"
+    log: "yes"
+  with_items: "{{ samba_ufw_access_with_log }}"
+
+- name: UFW | allow incoming traffic for defined ports
+  community.general.ufw:
+    rule: allow
+    interface: "{{ samba_ufw_if }}"
+    direction: in
+    to_port: "{{ item }}"
+  with_items: "{{ samba_ufw_allow_ports_in }}"
+
+- name: UFW | allow outgoing proxy traffic if apply
+  community.general.ufw:
+    rule: allow
+    interface: "{{ samba_ufw_if }}"
+    direction: out
+    dest: "{{ samba_proxy_ip }}"
+    to_port: "{{ samba_proxy_port }}"
+    log: "{{ samba_ufw_out_logging }}"
+  when:
+    - samba_proxy_ip != None
+    - samba_proxy_ip | string
+    - samba_proxy_port | string
+
+- name: UFW | allow outgoing traffic for defined ports - {{ samba_ufw_if }}
+  community.general.ufw:
+    rule: allow
+    interface: "{{ samba_ufw_if }}"
+    direction: out
+    to_port: "{{ item }}"
+    log: "{{ samba_ufw_out_logging }}"
+  with_items: "{{ samba_ufw_allow_ports_out }}"
+
+- name: UFW | allow all outgoing traffic for defined interfaces
+  community.general.ufw:
+    rule: "allow"
+    interface: "{{ item }}"
+    direction: "out"
+  with_items: "{{ samba_ufw_allow_if_out }}"
+
+- name: UFW | default policy
+  community.general.ufw:
+    state: enabled
+    direction: "{{ item }}"
+    policy: "{{ samba_ufw_default_policy }}"
+    log: yes
+  with_items:
+    - incoming
+    - outgoing

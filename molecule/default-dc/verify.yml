@@ -1,0 +1,109 @@
+---
+
+- name: Verify samba DC server
+  hosts: "{{ playbook_hosts | default('all') }}"
+  vars:
+    # samba_role: fileserver
+    samba_role: dc
+    dc_domain: samdom.example.com
+  tasks:
+    - name: Anonymous smbclient
+      ansible.builtin.command:
+        cmd: smbclient -L localhost -N
+      changed_when: false
+    - name: Root smbstatus
+      ansible.builtin.command:
+        cmd: smbstatus
+      become: true
+      changed_when: false
+    - name: File server
+      when:
+        - samba_role == 'fileserver'
+      block:
+        - name: Send file
+          ansible.builtin.command:  # noqa no-changed-when
+            cmd: smbclient //localhost/tmp -c 'cd ; put hosts test' -N
+          args:
+            chdir: /etc
+        - name: Rename file
+          ansible.builtin.command:  # noqa no-changed-when
+            cmd: smbclient //localhost/tmp -c 'cd ; rename test test2' -N
+        - name: Remove file
+          ansible.builtin.command:  # noqa no-changed-when
+            cmd: smbclient //localhost/tmp -c 'cd ; del test2' -N
+        - name: Add dir
+          ansible.builtin.command:  # noqa no-changed-when
+            cmd: smbclient //localhost/tmp -c 'cd ; mkdir testdir' -N
+        - name: Check journalctl
+          ansible.builtin.command:
+            cmd: journalctl -u smbd -t smbd_audit -n 5
+          become: true
+          changed_when: false
+    - name: DC server
+      when:
+        - samba_role == 'dc'
+      block:
+        # Win: dcdiag, repadmin, Get-ADDomain, Get-ADForest
+        # samba-tool ldapcmp <URL1> <URL2>
+        # samba-tool drs showrepl
+        - name: DC | samba-tool domain level show
+          ansible.builtin.command:  # noqa no-changed-when
+            cmd: samba-tool domain level show
+          become: true
+          changed_when: false
+        - name: DC | samba-tool dbcheck
+          ansible.builtin.command:  # noqa no-changed-when
+            cmd: samba-tool dbcheck
+          become: true
+          changed_when: false
+        - name: DC | samba-tool domain passwordsettings show
+          ansible.builtin.command:  # noqa no-changed-when
+            cmd: samba-tool domain passwordsettings show
+          become: true
+          changed_when: false
+        - name: DC | List domain users
+          ansible.builtin.command:  # noqa no-changed-when
+            cmd: wbinfo -u
+          become: true
+          changed_when: false
+        - name: DC | smbclient -L localhost -U%
+          ansible.builtin.command:  # noqa no-changed-when
+            cmd: smbclient -L localhost -U%
+          changed_when: false
+        - name: DC | DNS localhost _ldap._tcp
+          ansible.builtin.command:  # noqa no-changed-when
+            cmd: "dig @localhost SRV _ldap._tcp.{{ dc_domain }} +short"
+          changed_when: false
+        - name: DC | DNS general _ldap._tcp
+          ansible.builtin.command:  # noqa no-changed-when
+            cmd: "dig SRV _ldap._tcp.{{ dc_domain }} +short"
+          changed_when: false
+        - name: DC | DNS localhost _kerberos._udp
+          ansible.builtin.command:  # noqa no-changed-when
+            cmd: "dig @localhost SRV _kerberos._udp.{{ dc_domain }} +short"
+          changed_when: false
+        - name: DC | DNS general _kerberos._udp
+          ansible.builtin.command:  # noqa no-changed-when
+            cmd: "dig SRV _kerberos._udp.{{ dc_domain }} +short"
+          changed_when: false
+        - name: DC | DNS general
+          ansible.builtin.command:  # noqa no-changed-when
+            cmd: "samba_dnsupdate --verbose"
+          changed_when: false
+          become: true
+        - name: DC | GPO Resultant Set of Policy
+          ansible.builtin.command:  # noqa no-changed-when
+            cmd: samba-gpupdate --rsop
+          become: true
+          changed_when: false
+        # supposing inventory_hostname is short hostname
+        - name: DC | samba-tool computer show
+          ansible.builtin.command:  # noqa no-changed-when
+            cmd: "samba-tool computer show {{ inventory_hostname }}$"
+          become: true
+          changed_when: false
+        - name: DC | samba-tool spn list
+          ansible.builtin.command:  # noqa no-changed-when
+            cmd: "samba-tool spn list {{ inventory_hostname }}$"
+          become: true
+          changed_when: false

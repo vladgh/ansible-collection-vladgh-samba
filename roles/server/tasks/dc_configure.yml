@@ -1,0 +1,15 @@
+---
+
+- name: Customize smb.conf
+  community.general.ini_file:
+    path: /etc/samba/smb.conf
+    section: "{{ item.s }}"
+    option: "{{ item.o }}"
+    value: "{{ item.v }}"
+    mode: '0644'
+    owner: root
+    backup: true
+  loop: "{{ samba_custom_conf }}"
+  notify:
+    - Restart samba-ad-dc
+
