@@ -1,0 +1,12 @@
+---
+# https://samba.tranquil.it/doc/en/samba_advanced_methods/samba_reset_krbtgt.html
+
+- name: Get chgkrbtgtpass script
+  ansible.builtin.get_url:
+    # samba 4.19
+    url: https://gitlab.com/samba-team/samba/raw/v4-17-stable/source4/scripting/devel/chgkrbtgtpass
+    # samba 4.20
+    # url: https://gitlab.com/samba-team/samba/raw/v4-19-stable/source4/scripting/devel/chgkrbtgtpass
+    dest: /usr/local/sbin/chgkrbtgtpass
+    mode: '0755'
+    owner: root
