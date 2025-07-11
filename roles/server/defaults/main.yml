@@ -23,3 +23,7 @@ samba_local_master: true
 samba_domain_master: true
 samba_preferred_master: true
 samba_mitigate_cve_2017_7494: true
+
+samba_acl_enabled: false
+samba_acl_mountpoints:
+  - /

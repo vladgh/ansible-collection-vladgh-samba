@@ -3,15 +3,31 @@
   hosts: all
   become: true
   tasks:
+    - name: Create groups
+      ansible.builtin.group:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - testgroup
+        - timemachine
+        - usr1
     - name: Add test users
       ansible.builtin.user:
-        name: "{{ item }}"
-        groups: users
+        name: "{{ item.user }}"
+        group: "{{ item.group }}"
+        groups: "{{ item.groups | default(omit) }}"
         append: true
       loop:
-        - usr1
-        - usr2
-        - timemachine
+        - user: usr1
+          group: users
+        - user: usr2
+          group: users
+        - user: timemachine
+          group: users
+        - user: testuser
+          group: testgroup
+        - user: testuser2
+          group: users
     - name: Include role
       ansible.builtin.include_role:
         name: vladgh.samba.server
@@ -28,6 +44,26 @@
         samba_log_size: 60000
         samba_log_level: '3 passdb:5 auth:10 winbind:2 '
         samba_map_to_guest: Never
+        samba_acl_enabled: true
+        samba_acl_mountpoints:
+          - /
+
+        vault_sambauser_testuser: test
+        vault_sambauser_testuser2: test
+
+        samba_vfs_objects_full_audit:
+          - name: full_audit
+            options:
+              - name: prefix
+                value: "%u|%I|%m|%S"
+              - name: success
+                value: "mkdir rename unlink rmdir pwrite sendfile write read open"
+              - name: failure
+                value: "none"
+              - name: facility
+                value: LOCAL7
+              - name: priority
+                value: NOTICE
         samba_users:
           - name: usr1
             password: usr1
@@ -35,18 +71,24 @@
             password: usr2
           - name: timemachine
             password: timemachine
+          - name: testuser
+            password: "{{ vault_sambauser_testuser }}"
+          - name: testuser2
+            password: "{{ vault_sambauser_testuser2 }}"
         samba_username_map:
           - from: 'User Two'
             to: usr2
         samba_shares_root: /srv/samba
         samba_shares:
           - name: restrictedshare
+            acl: []
           - name: privateshare
             comment: 'Only readable/writeable by usr1'
             valid_users: usr1
             write_list: usr1
             group: usr1
             browseable: false
+            acl: []
           - name: protectedshare
             public: true
             comment: 'Public, but only writeable by usr2'
@@ -55,17 +97,20 @@
             group: users
             browseable: true
             include_file: protectedshare-include.conf
+            acl: []
           - name: publicshare
             comment: 'Public share, writeable by all members of group ‘users’'
             public: true
             write_list: +users
             group: users
             browseable: true
+            acl: []
           - name: guestshare
             comment: 'Share accessible for guests'
             guest_ok: true
             writeable: true
             browseable: true
+            acl: []
           - name: TimeMachine
             comment: 'Share useable as a TimeMachine backup target on MacOS'
             vfs_objects:
@@ -89,7 +134,25 @@
             public: false
             guest_ok: false
             browseable: false
+            acl: []
             create_mask: '0600'
+          - name: testshare
+            comment: share
+            path: /data/testshare
+            owner: testuser
+            group: testgroup
+            mode: "0775"
+            acl:
+              - name: testuser2
+                type: user
+                permission: rwx
+                default: true
+              - name: testgroup
+                type: group
+                permission: rwx
+                default: true
+            write_list: testuser testuser2
+            vfs_objects: "{{ samba_vfs_objects_full_audit }}"
           - name: NetworkRestrictedShare
             comment: 'Only allow / deny specific hosts'
             hosts_allow:
@@ -98,3 +161,4 @@
             hosts_deny:
               - 192.168.4.
               - 192.168.1.2
+            acl: []

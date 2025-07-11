@@ -14,3 +14,6 @@ smb_service: smbd
 nmb_service: nmbd
 
 samba_www_documentroot: /var/www
+
+samba_acl_packages:
+  - acl

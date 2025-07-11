@@ -22,3 +22,10 @@ provisioner:
     host_vars:
       instance:
         ansible_user: root
+# Runs the verify.yml playbook. Testinfra is also a supported method.
+# Check the Molecule documention for more information.
+verifier:
+  name: testinfra
+  options:
+    v: 1
+    sudo: true
