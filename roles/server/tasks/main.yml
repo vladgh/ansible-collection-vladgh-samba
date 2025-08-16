@@ -26,7 +26,7 @@
 - name: Register Samba version
   ansible.builtin.shell: >
     set -o nounset -o pipefail -o errexit &&
-    smbd --version | sed 's/Version //'
+    /usr/sbin/smbd --version | sed 's/Version //'
   args:
     executable: /bin/bash
   register: samba_version
