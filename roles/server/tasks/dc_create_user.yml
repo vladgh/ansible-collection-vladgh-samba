@@ -1,0 +1,9 @@
+---
+
+- name: "Create user {{ login }}"
+  ansible.builtin.command:  # noqa no-changed-when
+    cmd: "samba-tool user create {{ login }} {{ password }} {{ extras }}"
+  become: true
+  no_log: "{{ samba_no_log }}"
+  when:
+    - "login not in smb_users.stdout"

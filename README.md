@@ -2,7 +2,7 @@
 
 ![Test Status](https://github.com/vladgh/ansible-collection-vladgh-samba/actions/workflows/test.yml/badge.svg)
 
-An Ansible collection for setting up Samba as a file server. It is tested on Ubuntu, Debian, CentOS and Arch Linux. Specifically, the responsibilities of this collection are to:
+An Ansible collection for setting up Samba as a file server or a domain controller (primary or secondaries). It is tested on Ubuntu, Debian, CentOS and Arch Linux. Specifically, the responsibilities of this collection are to:
 
 - Install the necessary packages
 - Create share directories
@@ -312,7 +312,8 @@ samba_global_config_extras: |
 
 ## Dependencies
 
-N/A
+* Fileserver: N/A
+* Domain Controller: DNS must be setup separately and match the target realm, domain/subdomain. NTP must be setup separately.
 
 ## Testing
 
@@ -327,6 +328,11 @@ This Molecule configuration will:
 
 This process is repeated for the supported Linux distributions.
 The Docker containers are based on images created by [Jeff Geerling](https://hub.docker.com/u/geerlingguy), specifically for Ansible testing (look for images named `geerlingguy/docker-DISTRO-ansible`).
+
+## Troubleshooting and Known issues
+
+* "INTERNAL ERROR: Security context active token stack underflow! in  () () pid 41380 (4.19.5-Ubuntu)":
+Samba Domain Controller provisioning has issues running inside unprivileged lxc container. Workaround is to use privileged container (https://forum.proxmox.com/threads/error-samba-ad-provisioning-into-lxc-container.33475/, https://github.com/turnkeylinux/tracker/issues/1666). Alternate solutions that may apply or not, either use nfs attributes to store acl (https://lists.samba.org/archive/samba/2021-February/234326.html), either tweak samba uid along alternate filesystem like btrfs (https://github.com/lxc/lxc/issues/2708#issuecomment-473466062).
 
 ## Changelog & Releases
 
