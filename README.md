@@ -327,25 +327,7 @@ This Molecule configuration will:
 - Run idempotence check
 
 This process is repeated for the supported Linux distributions.
-
-### Local test environment
-
-Steps to install the necessary tools manually:
-
-1. Docker and Python >= 3.8 should be installed on your machine (assumed to run Linux).
-2. As recommended by Molecule, create a python virtual environment
-3. Install the software tools `python3 -m pip install --user --upgrade pip ansible ansible-lint molecule docker`
-4. Navigate to the root of the collection directory and run `molecule test`
-
-Molecule automatically deletes the containers after a test. If you would like to check out the containers yourself, run `molecule converge` followed by `molecule login --host HOSTNAME`.
-
-The Docker containers are based on images created by [Jeff Geerling](https://hub.docker.com/u/geerlingguy), specifically for Ansible testing (look for images named `geerlingguy/docker-DISTRO-ansible`). You can use any of his images, but only the distributions mentioned in [meta/main.yml](meta/main.yml) are supported.
-
-The default config will start an Ubuntu 22.04 container. Choose another distro by setting the `MOLECULE_DISTRO` variable with the command, e.g.:
-
-```bash
-MOLECULE_DISTRO=debian11 molecule test
-```
+The Docker containers are based on images created by [Jeff Geerling](https://hub.docker.com/u/geerlingguy), specifically for Ansible testing (look for images named `geerlingguy/docker-DISTRO-ansible`).
 
 ## Troubleshooting and Known issues
 
