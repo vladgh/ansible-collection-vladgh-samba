@@ -2,10 +2,10 @@
 
 [global]
   # Server information
-  netbios name = {% if samba_netbios_name is defined and samba_netbios_name %}{{ samba_netbios_name }}{% else %}{{ ansible_facts['hostname'] }}{% endif +%}
-  mdns name = {% if samba_mdns_name is defined and samba_mdns_name %}{{ samba_mdns_name }}{% else %}netbios{% endif +%}
+  netbios name = {% if samba_netbios_name is defined and samba_netbios_name | length > 0 %}{{ samba_netbios_name }}{% else %}{{ ansible_facts['hostname'] }}{% endif +%}
+  mdns name = {% if samba_mdns_name is defined and samba_mdns_name | length > 0 %}{{ samba_mdns_name }}{% else %}netbios{% endif +%}
   workgroup = {{ samba_workgroup }}
-{% if samba_realm is defined and samba_realm %}
+{% if samba_realm is defined and samba_realm | length > 0 %}
   realm = {{ samba_realm }}
 {% endif %}
   server string = {{ samba_server_string }}
@@ -26,19 +26,19 @@
   security = {{ samba_security }}
   passdb backend = {{ samba_passdb_backend }}
   map to guest = {{ samba_map_to_guest }}
-{% if samba_guest_account  is defined and samba_guest_account %}
+{% if samba_guest_account  is defined and samba_guest_account | length > 0 %}
   guest account = {{ samba_guest_account }}
 {% endif %}
-{% if samba_username_map is defined and samba_username_map %}
+{% if samba_username_map is defined and samba_username_map | length > 0 %}
   username map = {{ samba_username_map_file }}
 {% endif %}
 
-{% if samba_server_min_protocol is defined and samba_server_min_protocol %}
+{% if samba_server_min_protocol is defined and samba_server_min_protocol | length > 0 %}
   # Minimum protocol version offered by the server
   server min protocol = {{ samba_server_min_protocol }}
 
 {% endif %}
-{% if samba_server_max_protocol is defined and samba_server_max_protocol %}
+{% if samba_server_max_protocol is defined and samba_server_max_protocol | length > 0 %}
   # Maximum protocol version offered by the server
   server max protocol = {{ samba_server_max_protocol }}
 
@@ -82,7 +82,7 @@
   include = {{ samba_configuration_dir }}/{{ samba_global_include | basename }}
 {% endif %}
 
-{% if samba_global_config_extras is defined and samba_global_config_extras %}
+{% if samba_global_config_extras is defined and samba_global_config_extras | length > 0 %}
   # User-defined extra config
   {% for line in samba_global_config_extras | split('\n') -%}
   {{ line | trim }}
@@ -97,7 +97,7 @@
   writeable = yes
 {% endif %}
 
-{% if samba_homes_include is defined and samba_homes_include %}
+{% if samba_homes_include is defined and samba_homes_include | length > 0 %}
   include = {{ samba_configuration_dir }}/{{ samba_homes_include }}
 {% endif %}
 
@@ -123,16 +123,16 @@
 {% endfor %}{% endif %}
   path = {{ share.path | default([samba_shares_root,share.name] | join('/')) }}
   public = {{ share.public | default('no') | bool | ternary('yes', 'no') }}
-{% if share.valid_users is defined and share.valid_users %}
+{% if share.valid_users is defined and share.valid_users | length > 0 %}
   valid users = {{ share.valid_users }}
 {% endif %}
-{% if share.write_list is defined and share.write_list %}
+{% if share.write_list is defined and share.write_list | length > 0 %}
   write list = {{ share.write_list }}
 {% endif %}
-{% if share.group is defined and share.group %}
+{% if share.group is defined and share.group | length > 0 %}
   force group = {{ share.group }}
 {% endif %}
-{% if share.user is defined and share.user %}
+{% if share.user is defined and share.user | length > 0 %}
   force user = {{ share.user }}
 {% endif %}
 {% if share.guest_ok is defined %}
@@ -157,7 +157,7 @@
   force create mode = {{ share.force_create_mode | default('0664') }}
   directory mode = {{ share.directory_mode | default('0775') }}
   force directory mode = {{ share.force_directory_mode | default('0775') }}
-{% if share.include_file is defined and share.include_file %}
+{% if share.include_file is defined and share.include_file | length > 0 %}
   include = {{ samba_configuration_dir }}/{{ share.include_file | basename }}
 {% endif %}
 {% if share.hosts_allow is defined and share.hosts_allow | length > 0 %}
