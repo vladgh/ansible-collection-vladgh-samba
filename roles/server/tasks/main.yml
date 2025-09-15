@@ -41,8 +41,8 @@
     owner: root
     group: root
     mode: '0755'
-  when: (samba_shares is defined and samba_shares | length > 0) and
-        ( samba_manage_directories is defined and samba_manage_directories )
+  when: ( samba_shares is defined and samba_shares | length > 0 ) and
+        ( samba_manage_directories is defined and samba_manage_directories | bool )
   tags: samba
 
 - name: Create share directories
@@ -55,7 +55,7 @@
     setype: "{{ item.setype | default(omit) }}"
   loop: "{{ samba_shares }}"
   when: ( samba_shares is defined and samba_shares | length > 0 ) and
-        ( samba_manage_directories is defined and samba_manage_directories )
+        ( samba_manage_directories is defined and samba_manage_directories | bool )
   tags: samba
 
 - name: Ensure webserver document root exists
@@ -94,7 +94,7 @@
     dest: "{{ samba_configuration_dir }}"
     validate: 'testparm -s %s'
     mode: '0644'
-  when: samba_global_include is defined and samba_global_include
+  when: samba_global_include is defined and samba_global_include | length > 0
   notify:
     - Restart SMB service
     - Restart NMB service
@@ -106,7 +106,7 @@
     dest: "{{ samba_configuration_dir }}"
     validate: 'testparm -s %s'
     mode: '0644'
-  when: samba_homes_include is defined and samba_homes_include
+  when: samba_homes_include is defined and samba_homes_include | length > 0
   notify:
     - Restart SMB service
     - Restart NMB service
@@ -120,7 +120,7 @@
     mode: '0644'
   when: >
         ( samba_shares is defined and samba_shares | length > 0 ) and
-        ( item.include_file is defined and item.include_file )
+        ( item.include_file is defined and item.include_file | length > 0 )
   loop: "{{ samba_shares }}"
   notify:
     - Restart SMB service
@@ -135,7 +135,7 @@
   notify:
     - Restart SMB service
     - Restart NMB service
-  when: samba_username_map is defined and samba_username_map
+  when: samba_username_map is defined and samba_username_map | length > 0
   tags: samba
 
 - name: Start SMB service
