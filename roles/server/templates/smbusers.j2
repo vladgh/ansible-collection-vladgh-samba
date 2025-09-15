@@ -1,5 +1,3 @@
-{{ ansible_managed | comment }}
-
 {% if samba_username_map is defined and samba_username_map | length > 0 %}
 {% for entry in samba_username_map %}
 {{ entry.to }} = {{ entry.from }}

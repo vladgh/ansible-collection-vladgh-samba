@@ -1,5 +1,3 @@
-{{ ansible_managed | comment }}
-
 [global]
   # Server information
   netbios name = {% if samba_netbios_name is defined and samba_netbios_name | length > 0 %}{{ samba_netbios_name }}{% else %}{{ ansible_facts['hostname'] }}{% endif +%}
