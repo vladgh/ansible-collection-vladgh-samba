@@ -1,4 +1,7 @@
 ---
+- name: include assert
+  ansible.builtin.include_tasks: assert.yml
+
 - name: Include OS specific variables
   ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
   vars:
@@ -167,3 +170,27 @@
   when: samba_users is defined and samba_users | length > 0
   changed_when: "'Added user' in create_user_output.stdout"
   tags: samba
+
+# this need to be installed before modification to fstab, because fstab.yml
+# needs chacl tool installed
+- name: include installation of acl tools
+  ansible.builtin.include_tasks: acltools.yml
+  when:
+    - samba_acl_enabled | bool
+  tags:
+    - acl
+
+- name: include modifications in fstab
+  ansible.builtin.include_tasks: fstab.yml
+  with_items: "{{ samba_acl_mountpoints }}"
+  when:
+    - samba_acl_enabled | bool
+  tags:
+    - acl
+
+- name: include configuration of ACL
+  ansible.builtin.include_tasks: acl.yml
+  when:
+    - samba_acl_enabled | bool
+  tags:
+    - acl
