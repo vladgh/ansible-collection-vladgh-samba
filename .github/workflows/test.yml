@@ -3,7 +3,7 @@ name: Test
 on:
   push:
     branches:
-      - '*'
+      - 'main'
     tags:
       - 'v*.*.*'
   pull_request:
@@ -40,8 +40,8 @@ jobs:
       fail-fast: true
       matrix:
         os:
+          - ubuntu2604
           - ubuntu2404
-          - ubuntu2204
           - debian13
           - debian12
           - fedora42
