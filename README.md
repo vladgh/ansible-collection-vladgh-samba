@@ -28,6 +28,8 @@ More info: <https://access.redhat.com/security/cve/cve-2017-7494>
 
 ## Using this collection
 
+Requires ansible-core 2.21 or newer.
+
 ### Install collection
 
 Install it with the Ansible Galaxy CLI:
