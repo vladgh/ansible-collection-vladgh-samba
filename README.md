@@ -327,8 +327,12 @@ This Molecule configuration will:
 - Apply the role with a [test playbook](molecule/default/converge.yml)
 - Run idempotence check
 
-This process is repeated for the supported Linux distributions.
-The Docker containers are based on images created by [Jeff Geerling](https://hub.docker.com/u/geerlingguy), specifically for Ansible testing (look for images named `geerlingguy/docker-DISTRO-ansible`).
+CI repeats this process with official `ubuntu:24.04`, `ubuntu:26.04`,
+`debian:12`, `debian:13`, `fedora:44`, and `fedora:45` images. The Fedora tags
+cover the latest two releases and should be advanced when a new release ships.
+Molecule builds the scenario's
+[Dockerfile](molecule/default/Dockerfile.j2) locally; no custom image registry
+or publishing workflow is needed. Ubuntu 26.04 is the default locally.
 
 ## Changelog & Releases
 

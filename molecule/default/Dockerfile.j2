@@ -1,0 +1,37 @@
+FROM {{ item.image }}
+
+ENV container=docker
+
+RUN if command -v apt-get >/dev/null 2>&1; then \
+        apt-get update \
+        && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        ca-certificates \
+        dbus \
+        iproute2 \
+        procps \
+        python3 \
+        python3-apt \
+        sudo \
+        systemd \
+        systemd-sysv \
+        && apt-get clean \
+        && rm -rf /var/lib/apt/lists/*; \
+    elif command -v dnf >/dev/null 2>&1; then \
+        dnf install -y --setopt=install_weak_deps=False \
+            ca-certificates \
+            dbus \
+            iproute \
+            procps-ng \
+            python3 \
+            python3-libdnf5 \
+            sudo \
+            systemd \
+        && dnf clean all; \
+    else \
+        echo 'Expected an Ubuntu, Debian, or Fedora base image' >&2; \
+        exit 1; \
+    fi
+
+STOPSIGNAL SIGRTMIN+3
+
+CMD ["/sbin/init"]
