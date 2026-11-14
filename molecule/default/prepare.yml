@@ -10,13 +10,10 @@
             (ansible_facts['distribution'] == 'Ubuntu' and
              ansible_facts['distribution_version'] in ['24.04', '26.04']) or
             (ansible_facts['distribution'] == 'Debian' and
-             ansible_facts['distribution_major_version'] in ['12', '13']) or
-            (ansible_facts['distribution'] == 'Fedora' and
-             ansible_facts['distribution_major_version'] in ['44', '45'])
+             ansible_facts['distribution_major_version'] in ['12', '13'])
           - ansible_facts['service_mgr'] == 'systemd'
         fail_msg: >-
-          Use Ubuntu 24.04/26.04, Debian 12/13, or Fedora 44/45
-          with systemd as PID 1.
+          Use Ubuntu 24.04/26.04 or Debian 12/13 with systemd as PID 1.
 
     # systemd_service does not expose the overall system initialization state.
     - name: Wait for systemd initialization  # noqa: command-instead-of-module

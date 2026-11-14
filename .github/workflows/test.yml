@@ -44,8 +44,6 @@ jobs:
           - ubuntu:26.04
           - debian:12
           - debian:13
-          - fedora:44
-          - fedora:45
         scenario: ${{ fromJSON(needs.changes.outputs.scenario) }}
     steps:
       - name: Checkout
