@@ -2,7 +2,8 @@
 
 ![Test Status](https://github.com/vladgh/ansible-collection-vladgh-samba/actions/workflows/test.yml/badge.svg)
 
-An Ansible collection for setting up Samba as a file server. It is tested on Ubuntu, Debian, CentOS and Arch Linux. Specifically, the responsibilities of this collection are to:
+An Ansible collection for setting up Samba as a file server on Ubuntu LTS and
+Debian. Specifically, the responsibilities of this collection are to:
 
 - Install the necessary packages
 - Create share directories
@@ -327,8 +328,11 @@ This Molecule configuration will:
 - Apply the role with a [test playbook](molecule/default/converge.yml)
 - Run idempotence check
 
-This process is repeated for the supported Linux distributions.
-The Docker containers are based on images created by [Jeff Geerling](https://hub.docker.com/u/geerlingguy), specifically for Ansible testing (look for images named `geerlingguy/docker-DISTRO-ansible`).
+CI repeats this process with official `ubuntu:24.04`, `ubuntu:26.04`,
+`debian:12`, and `debian:13` images.
+Molecule builds the scenario's
+[Dockerfile](molecule/default/Dockerfile.j2) locally; no custom image registry
+or publishing workflow is needed. Ubuntu 26.04 is the default locally.
 
 ## Changelog & Releases
 

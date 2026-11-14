@@ -2,20 +2,35 @@
 - name: Prepare
   hosts: all
   become: true
-  pre_tasks:
-    - name: Update apt cache
+  tasks:
+    - name: Require a supported test platform running systemd
+      ansible.builtin.assert:
+        that:
+          - >-
+            (ansible_facts['distribution'] == 'Ubuntu' and
+             ansible_facts['distribution_version'] in ['24.04', '26.04']) or
+            (ansible_facts['distribution'] == 'Debian' and
+             ansible_facts['distribution_major_version'] in ['12', '13'])
+          - ansible_facts['service_mgr'] == 'systemd'
+        fail_msg: >-
+          Use Ubuntu 24.04/26.04 or Debian 12/13 with systemd as PID 1.
+
+    # systemd_service does not expose the overall system initialization state.
+    - name: Wait for systemd initialization  # noqa: command-instead-of-module
+      ansible.builtin.command:
+        argv:
+          - systemctl
+          - is-system-running
+      register: systemctl_status
+      until: systemctl_status.stdout in ['running', 'degraded']
+      retries: 30
+      delay: 5
+      changed_when: false
+      failed_when: systemctl_status.rc > 1
+      check_mode: false
+
+    - name: Update apt cache for role package installation
       ansible.builtin.apt:
         update_cache: true
         cache_valid_time: 600
       when: ansible_facts['os_family'] == 'Debian'
-    - name: Wait for systemd to complete initialization.  # noqa command-instead-of-module
-      ansible.builtin.command: systemctl is-system-running
-      register: systemctl_status
-      until: >
-        'running' in systemctl_status.stdout or
-        'degraded' in systemctl_status.stdout
-      retries: 30
-      delay: 5
-      when: ansible_facts['service_mgr'] == 'systemd'
-      changed_when: false
-      failed_when: systemctl_status.rc > 1
